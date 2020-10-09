@@ -1,8 +1,8 @@
 # Getting Started
 
-## Install Django
+## MacOS
 
-### MacOS
+### Install Django
 
 Follow the Django instructions to install Django: https://docs.djangoproject.com/en/3.1/intro/install/. Generally, you have to do the following:
 - `brew install python` - Install the latest version of Python
@@ -13,9 +13,7 @@ Follow the Django instructions to install Django: https://docs.djangoproject.com
 - `pipenv run python manage.py runserver` - start the Django development server
 - Visit localhost:8000, you should see a Django landing page
 
-## Setup Postgres
-
-### MacOS
+### Setup Postgres
 
 #### Install
 
