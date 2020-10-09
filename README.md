@@ -28,7 +28,7 @@ https://goonan.io/setting-up-postgresql-on-os-x-2/
 
 - `psql` - confirm that you can enter the postgres shell
 - `create database verifact;` - create the database
-- `grant all privileges on database mydb to postgres;` - give the default postgres user ownership of the new database
+- `grant all privileges on database verifact to postgres;` - give the default postgres user ownership of the new database
 - The settings in verifact/settings.py by default use the above database info and should now work as expected
 
 #### Migrate the database
