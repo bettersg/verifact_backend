@@ -40,3 +40,7 @@ https://goonan.io/setting-up-postgresql-on-os-x-2/
 - `pipenv run python manage.py runserver` - Start the Django development server
 - Go to localhost:8000/admin and log in with your admin credentials. You should see Users and Groups
 - You can also log into your postgres shell to confirm that it worked by running `psql verifact`, then once in the shell, run `\d` to show all relations. It should show a handful of django relations
+
+# Formatting
+
+In order to keep python formatting consistent, please use https://github.com/psf/black.
