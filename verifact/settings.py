@@ -37,8 +37,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "forum",
+    "graphene_django",
+    "verifact.forum",
 ]
+
+GRAPHENE = {"SCHEMA": "verifact.schema.schema"}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
