@@ -56,4 +56,4 @@ To learn more about GraphQL, visit https://graphql.org/
 
 ## GraphiQL
 
-Our schema has graphiql enabled to allow us to test queries easily. After starting up the django server (`pipenv run python manage.py runserver`), you can visit `localhost:8000/graphql` to query the API.
+Graphiql is a UI interface that allows us to easily test queries. After starting up the django server (`pipenv run python manage.py runserver`), you can visit `localhost:8000/graphql` to query the API.
