@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 ## MacOS
 
@@ -22,7 +22,7 @@ https://goonan.io/setting-up-postgresql-on-os-x-2/
 - `brew install postgresql` - Install Postgres
 - `pipenv install psycopg2` - Allows Django to work with Postgres
 
-#### Create Database
+#### Create database
 
 - `psql` - confirm that you can enter the postgres shell
 - `create database verifact;` - create the database
@@ -41,6 +41,19 @@ https://goonan.io/setting-up-postgresql-on-os-x-2/
 - Go to localhost:8000/admin and log in with your admin credentials. You should see Users and Groups
 - You can also log into your postgres shell to confirm that it worked by running `psql verifact`, then once in the shell, run `\d` to show all relations. It should show a handful of django relations
 
-# Formatting
+#### Preload data
+- `pipenv run python manage.py loaddata questions` - This command loads the data from `verifact/forum/fixtures/questions` into the database.
 
-In order to keep python formatting consistent, please use https://github.com/psf/black.
+# Formatting style
+
+In order to maintain consistent formatting within this project, please use https://github.com/psf/black.
+
+# GraphQL
+
+GraphQL provides a single endpoint and allows us to query our entire API through that endpoint. This allows us to focus on the releationships of our data instead of designing a flexible REST API. Because it uses a graph instead of hierarchical data, we also only fetch the data we need, thereby avoiding excessive trips to the database.
+
+To learn more about GraphQL, visit https://graphql.org/
+
+## GraphiQL
+
+Our schema has graphiql enabled to allow us to test queries easily. After starting up the django server (`pipenv run python manage.py runserver`), you can visit `localhost:8000/graphql` to query the API.
