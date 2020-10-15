@@ -1,0 +1,24 @@
+[
+    {
+        "model":"forum.question",
+        "pk":1,
+        "fields":{
+            "created_at": "2020-10-10T17:41:28+00:00",
+            "text": "Will we be allowed to travel in phase 3?",
+            "citation_url": "https://www.straitstimes.com/politics/parliament-govt-to-release-details-on-roadmap-to-phase-3-in-coming-weeks-including-changes",
+            "citation_title": "Plans for phase 3 of S'pore's reopening to be revealed in weeks",
+            "citation_image_url": "https://www.straitstimes.com/sites/default/files/styles/article_pictrure_780x520_/public/articles/2020/10/05/fhdining0510201.jpg?itok=fc-AqsWd&timestamp=1601880471"
+        }
+    },
+    {
+        "model":"forum.question",
+        "pk":2,
+        "fields":{
+            "created_at": "2020-10-10T17:41:28+00:00",
+            "text": "Is Trump acting recklessly by continuing to campaign after covid diagnosis?",
+            "citation_url": "https://www.straitstimes.com/world/united-states/organisers-cancel-oct-15-us-presidential-debate",
+            "citation_title": "Second presidential debate cancelled; Trump to resume campaigning",
+            "citation_image_url": "https://www.straitstimes.com/sites/default/files/styles/article_pictrure_780x520_/public/articles/2020/10/10/nz_coll_101068.jpg?itok=56KXQIUX&timestamp=1602305053"
+        }
+    }
+]
