@@ -14,13 +14,15 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    class AnswerTypes(models.IntegerChoices):
-        TRUE = 1, _("True")
-        FALSE = 2, _("False")
-        NEITHER = 3, _("Neither")
-
     created_at = models.DateTimeField(auto_now_add=True)
-    answer = models.IntegerField(choices=AnswerTypes.choices)
+    answer = models.CharField(
+        choices=[
+            ("True", "True"),
+            ("False", "False"),
+            ("Neither", "Neither"),
+        ],
+        max_length=8,
+    )
     text = models.CharField(max_length=2048)
     citation_url = models.CharField(max_length=2048)
     citation_title = models.CharField(max_length=2048)
@@ -32,3 +34,11 @@ class Answer(models.Model):
 
     def __str__(self):
         return "[%s] %s" % (self.get_answer_display(), self.text)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_answer_valid",
+                check=models.Q(answer__in=["True", "False", "Neither"])
+            )
+        ]
