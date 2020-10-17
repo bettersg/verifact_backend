@@ -20,13 +20,16 @@ class QuestionConnection(relay.Connection):
     class Meta:
         node = QuestionNode
 
+class AnswerConnection(relay.Connection):
+    class Meta:
+        node = AnswerNode
 
 class Query(ObjectType):
     question = relay.Node.Field(QuestionNode)
     questions = relay.ConnectionField(QuestionConnection)
 
     answer = relay.Node.Field(AnswerNode)
-    answers = relay.ConnectionField(AnswerNode)
+    answers = relay.ConnectionField(AnswerConnection)
 
     def resolve_questions(root, info):
         return Question.objects.all()

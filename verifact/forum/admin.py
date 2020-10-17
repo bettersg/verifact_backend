@@ -6,6 +6,6 @@ from .models import Question, Answer
 class QuestionAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(Answers)
+@admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     pass
