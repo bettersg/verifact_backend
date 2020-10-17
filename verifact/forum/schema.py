@@ -1,6 +1,5 @@
 from graphene import relay, ObjectType
 from graphene_django import DjangoObjectType
-from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import Question, Answer
 
@@ -14,7 +13,6 @@ class QuestionNode(DjangoObjectType):
 class AnswerNode(DjangoObjectType):
     class Meta:
         model = Answer
-        filter_fields = {"question_id": ["exact"]}
         interfaces = (relay.Node,)
 
 
@@ -28,7 +26,7 @@ class Query(ObjectType):
     questions = relay.ConnectionField(QuestionConnection)
 
     answer = relay.Node.Field(AnswerNode)
-    answers = DjangoFilterConnectionField(AnswerNode)
+    answers = relay.ConnectionField(AnswerNode)
 
     def resolve_questions(root, info):
         return Question.objects.all()

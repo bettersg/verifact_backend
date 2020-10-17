@@ -17,7 +17,7 @@ class Answer(models.Model):
     class AnswerTypes(models.IntegerChoices):
         TRUE = 1, _("True")
         FALSE = 2, _("False")
-        OTHER = 3, _("Other")
+        NEITHER = 3, _("Neither")
 
     created_at = models.DateTimeField(auto_now_add=True)
     answer = models.IntegerField(choices=AnswerTypes.choices)
@@ -26,7 +26,8 @@ class Answer(models.Model):
     citation_title = models.CharField(max_length=2048)
     credible_count = models.IntegerField()
     not_credible_count = models.IntegerField()
-    question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    related_name="answers"
 
     def __str__(self):
         return "[%s] %s" % (self.get_answer_display(), self.text)
