@@ -14,15 +14,18 @@ class AnswerNode(DjangoObjectType):
     class Meta:
         model = Answer
         interfaces = (relay.Node,)
+        convert_choices_to_enum = False
 
 
 class QuestionConnection(relay.Connection):
     class Meta:
         node = QuestionNode
 
+
 class AnswerConnection(relay.Connection):
     class Meta:
         node = AnswerNode
+
 
 class Query(ObjectType):
     question = relay.Node.Field(QuestionNode)
