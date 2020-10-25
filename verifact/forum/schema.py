@@ -8,6 +8,7 @@ from django.db import IntegrityError
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
+from .. import error_strings
 from .models import Question, Answer
 
 
@@ -69,7 +70,7 @@ class QuestionCreate(Mutation):
         try:
             URLValidator(citation_url)
         except ValidationError:
-            raise GraphQLError('citationUrl has invalid format!')
+            raise GraphQLError(error_strings.URL_FORMAT_INVALID)
         question = Question.objects.create(
             text=text,
             citation_url=citation_url,
@@ -103,7 +104,7 @@ class AnswerCreate(Mutation):
         try:
             URLValidator(citation_url)
         except ValidationError:
-            raise GraphQLError('citationUrl has invalid format!')
+            raise GraphQLError(error_strings.URL_FORMAT_INVALID)
 
         try:
             answer = Answer.objects.create(
@@ -116,9 +117,14 @@ class AnswerCreate(Mutation):
                 question=Node.get_node_from_global_id(info, question_id, only_type = QuestionNode),
             )
             answer.save()
-        except IntegrityError as e:
-            if str(e.__cause__).startswith('new row for relation "forum_answer" violates check constraint "forum_answer_answer_valid"'): # this works but looks kinda bandaidy
-                raise GraphQLError('answer must be True, False, or Neither')
+        except IntegrityError as ie:
+            if str(ie.__cause__).startswith('new row for relation "forum_answer" violates check constraint "forum_answer_answer_valid"'): # this works but looks kinda bandaidy
+                raise GraphQLError(error_strings.ANSWER_CHOICES_INVALID)
+            else:
+                raise
+        except AssertionError as ae:
+            if str(ae).startswith("Must receive a QuestionNode id."):
+                raise GraphQLError(error_strings.QUESTION_ID_INVALID)
             else:
                 raise
 
