@@ -1,7 +1,8 @@
 from graphene import relay, ObjectType, Mutation
-from graphene import DateTime, String, Int, Field
+from graphene import DateTime, String, Int, Field, ID
 from graphene_django import DjangoObjectType
 import base64
+from graphene.relay import Node
 from graphql import GraphQLError
 from django.db import IntegrityError
 from django.core.validators import URLValidator
@@ -65,9 +66,8 @@ class QuestionCreate(Mutation):
         citation_title="",
         citation_image_url="",
     ):
-        val = URLValidator()
         try:
-            val(citation_url)
+            URLValidator(citation_url)
         except ValidationError:
             raise GraphQLError('citationUrl has invalid format!')
         question = Question.objects.create(
@@ -87,7 +87,7 @@ class AnswerCreate(Mutation):
         text = String()
         citation_url = String()
         citation_title = String()
-        question_id = String()
+        question_id = ID()
 
     answer = Field(AnswerNode)
 
@@ -100,9 +100,8 @@ class AnswerCreate(Mutation):
         citation_url="",
         citation_title="",
     ):
-        val = URLValidator()
         try:
-            val(citation_url)
+            URLValidator(citation_url)
         except ValidationError:
             raise GraphQLError('citationUrl has invalid format!')
 
@@ -114,9 +113,7 @@ class AnswerCreate(Mutation):
                 citation_title=citation_title,
                 credible_count=0,
                 not_credible_count=0,
-                question=Question.objects.get(
-                    pk=int(base64.b64decode(question_id.encode()).decode().split(':')[1])
-                ),
+                question=Node.get_node_from_global_id(info, question_id, only_type = QuestionNode),
             )
             answer.save()
         except IntegrityError as e:
