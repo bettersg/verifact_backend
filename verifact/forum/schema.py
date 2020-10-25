@@ -49,7 +49,6 @@ class Query(ObjectType):
         return Answer.objects.all()
 
 
-
 class QuestionCreate(Mutation):
     class Arguments:
         text = String()
@@ -75,8 +74,8 @@ class QuestionCreate(Mutation):
             text=text,
             citation_url=citation_url,
             citation_title=citation_title,
-            citation_image_url=citation_image_url
-            )
+            citation_image_url=citation_image_url,
+        )
 
         question.save()
         return QuestionCreate(question=question)
@@ -114,11 +113,15 @@ class AnswerCreate(Mutation):
                 citation_title=citation_title,
                 credible_count=0,
                 not_credible_count=0,
-                question=Node.get_node_from_global_id(info, question_id, only_type = QuestionNode),
+                question=Node.get_node_from_global_id(
+                    info, question_id, only_type=QuestionNode
+                ),
             )
             answer.save()
         except IntegrityError as ie:
-            if str(ie.__cause__).startswith('new row for relation "forum_answer" violates check constraint "forum_answer_answer_valid"'): # this works but looks kinda bandaidy
+            if str(ie.__cause__).startswith(
+                'new row for relation "forum_answer" violates check constraint "forum_answer_answer_valid"'
+            ):
                 raise GraphQLError(error_strings.ANSWER_CHOICES_INVALID)
             else:
                 raise
