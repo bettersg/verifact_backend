@@ -1,8 +1,7 @@
-from graphene import relay, ObjectType, Mutation
-from graphene import DateTime, String, Int, Field, ID
+from graphene import relay, ObjectType, String, Field, ID
+from graphene.relay import Node, ClientIDMutation
 from graphene_django import DjangoObjectType
 import base64
-from graphene.relay import Node
 from graphql import GraphQLError
 from django.db import IntegrityError
 from django.core.validators import URLValidator
@@ -49,22 +48,17 @@ class Query(ObjectType):
         return Answer.objects.all()
 
 
-class QuestionCreate(Mutation):
-    class Arguments:
+class QuestionCreate(ClientIDMutation):
+    question = Field(QuestionNode)
+
+    class Input:
         text = String()
         citation_url = String()
         citation_title = String()
         citation_image_url = String()
 
-    question = Field(QuestionNode)
-
-    def mutate(
-        self,
-        info,
-        text,
-        citation_url,
-        citation_title="",
-        citation_image_url="",
+    def mutate_and_get_payload(
+        self, info, text, citation_url, citation_title="", citation_image_url=""
     ):
         try:
             URLValidator(citation_url)
@@ -81,17 +75,17 @@ class QuestionCreate(Mutation):
         return QuestionCreate(question=question)
 
 
-class AnswerCreate(Mutation):
-    class Arguments:
+class AnswerCreate(ClientIDMutation):
+    answer = Field(AnswerNode)
+
+    class Input:
         answer = String()
         text = String()
         citation_url = String()
         citation_title = String()
         question_id = ID()
 
-    answer = Field(AnswerNode)
-
-    def mutate(
+    def mutate_and_get_payload(
         self,
         info,
         answer,
