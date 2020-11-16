@@ -8,8 +8,7 @@ Follow the Django instructions to install Django: https://docs.djangoproject.com
 - `brew install python` - Install the latest version of Python
 - `brew install pipenv` - Install pipenv to isolate your python packages
 - `cd <project_dir>`
-- `pipenv install` - Create a virtual environment
-- `pipenv install Django` - Install the Django official release
+- `pipenv install` - Create a virtual environment and install packages
 - `pipenv run python manage.py runserver` - start the Django development server
 - Visit localhost:8000, you should see a Django landing page
 
@@ -19,8 +18,7 @@ Follow the Django instructions to install Django: https://docs.djangoproject.com
 
 https://goonan.io/setting-up-postgresql-on-os-x-2/
 
-- `brew install postgresql` - Install Postgres
-- `pipenv install psycopg2` - Allows Django to work with Postgres
+- `brew install postgresql` - Install Postgres. Psycopg2 should already be installed from `pipenv install`
 
 #### Create database
 
@@ -53,6 +51,12 @@ In order to maintain consistent formatting within this project, please use https
 GraphQL provides a single endpoint and allows us to query our entire API through that endpoint. This allows us to focus on the releationships of our data instead of designing a flexible REST API. Because it uses a graph instead of hierarchical data, we also only fetch the data we need, thereby avoiding excessive trips to the database.
 
 To learn more about GraphQL, visit https://graphql.org/
+
+## Relay
+
+Relay requires a pre-defined schema in order to compile. To export a schema, run the following command:
+
+`pipenv run python ./manage.py graphql_schema --schema verifact.schema.schema --out schema.graphql`
 
 ## GraphiQL
 
