@@ -10,6 +10,8 @@ django = "*"
 psycopg2 = "*"
 graphene-django = "*"
 django-cors-headers = "*"
+django-graphql-jwt = "*"
+pyjwt = "==1.7.1" # 2.0.0 causes a bug in django-graphql-jwt https://github.com/flavors/django-graphql-jwt/issues/241
 
 [requires]
 python_version = "3.8"
