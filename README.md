@@ -2,30 +2,40 @@
 
 ## MacOS
 
+### Setup Postgres
+
+#### Install
+
+Installation instructions can be found here: https://goonan.io/setting-up-postgresql-on-os-x-2/. They include:
+
+- `brew install postgresql` - Install Postgres.
+
+#### Create database
+
+- `psql` - confirm that you can enter the postgres shell, you may need to specify the default database name, i.e. `psql postgres`
+- If your default user is not named `postgres`, create that superuser now: `CREATE ROLE rolename LOGIN SUPERUSER;`
+- `create database verifact;` - create the database
+- `grant all privileges on database verifact to postgres;` - give the default postgres user ownership of the new database
+- The settings in verifact/settings.py by default use the above database info and should now work as expected
+
 ### Install Django
 
 Follow the Django instructions to install Django: https://docs.djangoproject.com/en/3.1/intro/install/. Generally, you have to do the following:
 - `brew install python` - Install the latest version of Python
 - `brew install pipenv` - Install pipenv to isolate your python packages
 - `cd <project_dir>`
-- `pipenv install` - Create a virtual environment and install packages
-- `pipenv run python manage.py runserver` - start the Django development server
-- Visit localhost:8000, you should see a Django landing page
 
-### Setup Postgres
+### Install project dependencies
 
-#### Install
+Pipenv will create a virtual environment using the correct version of python and install the needed packages into that environment. For this reason, you must always use pipenv to run python commands. Create a virtual environment and install packages using:
 
-https://goonan.io/setting-up-postgresql-on-os-x-2/
+`pipenv install`
 
-- `brew install postgresql` - Install Postgres. Psycopg2 should already be installed from `pipenv install`
+If you see errors relating to psycopg2, common problems include linking ssl libraries. For more information, see https://github.com/pypa/pipenv/issues/3991#issuecomment-564645309. Based on that link, you can try explicitly linking openssl using:
 
-#### Create database
+`export LDFLAGS="-L/usr/local/opt/openssl/lib" export CPPFLAGS="-I/usr/local/opt/openssl/include"`
 
-- `psql` - confirm that you can enter the postgres shell
-- `create database verifact;` - create the database
-- `grant all privileges on database verifact to postgres;` - give the default postgres user ownership of the new database
-- The settings in verifact/settings.py by default use the above database info and should now work as expected
+Once the installation succeeds, you can move on to migrating the database.
 
 #### Migrate the database
 
