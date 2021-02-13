@@ -29,15 +29,10 @@ jobs:
           pip install pipenv
           pipenv install -d
 
-      - name: Collect Django static assets
-        run: pipenv run python manage.py collectstatic
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
       - name: Output requirements.txt for gcloud deploy
         run: pipenv lock -r > requirements.txt
 
-      - name: Inject app.yml environment variables for gcloud App Engine deployment
+      - name: Collect static and inject env vars for App Engine
         uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
@@ -47,6 +42,7 @@ jobs:
           DB_PORT: ${{ secrets.DB_PORT }}
           CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
           CLIENT_HOST: ${{ secrets.CLIENT_HOST }}
+        run: pipenv run python manage.py collectstatic
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.2.0
