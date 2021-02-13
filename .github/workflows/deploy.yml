@@ -31,6 +31,8 @@ jobs:
 
       - name: Collect Django static assets
         run: pipenv run python manage.py collectstatic
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
       - name: Output requirements.txt for gcloud deploy
         run: pipenv lock -r > requirements.txt
