@@ -2,8 +2,6 @@ import os
 from pathlib import Path
 from django.conf import settings
 
-from verifact.utils import cast_boolean
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["SECRET_KEY"]
 ALLOWED_HOSTS = [os.environ["CLIENT_HOST"]]

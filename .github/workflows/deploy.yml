@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Load Pipenv Cache
+      - name: Load Pipenv cache
         uses: actions/cache@v2
         with:
           path: ~/.local/share/virtualenvs
@@ -29,6 +29,9 @@ jobs:
           pip install pipenv
           pipenv install -d
 
+      - name: Output requirements.txt for gcloud deploy
+        run: pipenv lock -r > requirements.txt
+
       - name: Collect Django static assets
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
@@ -39,9 +42,6 @@ jobs:
           CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
           CLIENT_HOST: ${{ secrets.CLIENT_HOST }}
         run: pipenv run python manage.py collectstatic
-
-      - name: Output requirements.txt for gcloud deploy
-        run: pipenv lock -r > requirements.txt
 
       - name: Inject app.yml environment variables for gcloud App Engine deployment
         uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
