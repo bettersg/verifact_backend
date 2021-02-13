@@ -5,7 +5,7 @@ on:
       - main
       - deployment
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         run: pipenv lock -r > requirements.txt
 
       - name: Inject app.yml environment variables for gcloud App Engine deployment
-      - uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
+        uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DB_NAME: ${{ secrets.DB_NAME }}
