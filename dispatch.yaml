@@ -1,0 +1,3 @@
+dispatch:
+  - url: "api.verifact.sg/*"
+    service: verifact-backend
