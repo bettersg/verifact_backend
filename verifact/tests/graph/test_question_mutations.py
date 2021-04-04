@@ -33,6 +33,7 @@ def test_question_create_with_valid_input_returns_question():
         variables=variables,
     )
     assert res.data["questionCreate"]["question"]["text"] == question.text
+    assert Question.objects.first() is not None
 
 
 @pytest.mark.django_db
