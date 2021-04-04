@@ -74,7 +74,11 @@ Graphiql is a UI interface that allows us to easily test queries. After starting
 
 # Testing
 
-We use pytest to manage tests. To start the test suite, run:
+We use pytest to manage tests. First, install development dependencies by running:
+
+`pipenv install -d`
+
+Then, start the test suite by running:
 
 `pipenv run pytest`
 
