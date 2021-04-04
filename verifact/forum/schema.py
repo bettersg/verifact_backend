@@ -4,11 +4,11 @@ from graphene_django import DjangoObjectType
 import base64
 from graphql import GraphQLError
 from django.db import IntegrityError
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
+from graphql_jwt.decorators import login_required
 
 from .. import error_strings
 from .models import Question, Answer
+from verifact.graph.scalars import Url
 
 
 class QuestionNode(DjangoObjectType):
@@ -49,26 +49,23 @@ class QuestionCreate(ClientIDMutation):
     question = Field(QuestionNode)
 
     class Input:
-        text = String()
-        citation_url = String()
+        text = String(required=True)
+        citation_url = Url(required=True)
         citation_title = String()
-        citation_image_url = String()
+        citation_image_url = Url()
 
+    @login_required
     def mutate_and_get_payload(
         self, info, text, citation_url, citation_title="", citation_image_url=""
     ):
-        try:
-            URLValidator(citation_url)
-        except ValidationError:
-            raise GraphQLError(error_strings.URL_FORMAT_INVALID)
+        viewer = info.context.user
         question = Question.objects.create(
             text=text,
             citation_url=citation_url,
             citation_title=citation_title,
             citation_image_url=citation_image_url,
+            user=viewer
         )
-
-        question.save()
         return QuestionCreate(question=question)
 
 
@@ -76,12 +73,13 @@ class AnswerCreate(ClientIDMutation):
     answer = Field(AnswerNode)
 
     class Input:
-        answer = String()
+        answer = String(required=True)
         text = String()
-        citation_url = String()
+        citation_url = Url()
         citation_title = String()
         question_id = ID()
 
+    @login_required
     def mutate_and_get_payload(
         self,
         info,
@@ -91,11 +89,7 @@ class AnswerCreate(ClientIDMutation):
         citation_url="",
         citation_title="",
     ):
-        try:
-            URLValidator(citation_url)
-        except ValidationError:
-            raise GraphQLError(error_strings.URL_FORMAT_INVALID)
-
+        viewer = info.context.user
         try:
             answer = Answer.objects.create(
                 answer=answer,
@@ -107,8 +101,8 @@ class AnswerCreate(ClientIDMutation):
                 question=Node.get_node_from_global_id(
                     info, question_id, only_type=QuestionNode
                 ),
+                user=viewer
             )
-            answer.save()
         except IntegrityError as ie:
             if str(ie.__cause__).startswith(
                 'new row for relation "forum_answer" violates check constraint "forum_answer_answer_valid"'
