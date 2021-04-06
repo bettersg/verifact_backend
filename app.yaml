@@ -1,0 +1,23 @@
+service: verifact-backend
+
+runtime: python38
+
+handlers:
+  - url: /static
+    static_dir: static/
+    secure: always
+
+  - url: /.*
+    script: auto
+    secure: always
+
+entrypoint: gunicorn -b :$PORT verifact.wsgi:application && python3 manage.py migrate --noinput
+
+env_variables:
+  SECRET_KEY: $SECRET_KEY
+  DB_NAME: $DB_NAME
+  DB_PASSWORD: $DB_PASSWORD
+  DB_HOST: $DB_HOST
+  DB_PORT: $DB_PORT
+  CLIENT_ORIGIN: $CLIENT_ORIGIN
+  CLIENT_HOST: $CLIENT_HOST

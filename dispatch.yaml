@@ -1,0 +1,9 @@
+dispatch:
+  - url: "api.verifact.sg/*"
+    service: verifact-backend
+
+  - url: "verifact.sg/*"
+    service: verifact-frontend
+
+  - url: "www.verifact.sg/*"
+    service: verifact-frontend

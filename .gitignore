@@ -1,0 +1,5 @@
+.DS_STORE
+requirements.txt
+.env
+.env.production
+static/
