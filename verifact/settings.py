@@ -2,6 +2,9 @@ import os
 from pathlib import Path
 from django.conf import settings
 
+from verifact.utils import cast_boolean
+
+DEBUG = cast_boolean(os.environ.get("DEBUG", False))
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["SECRET_KEY"]
 ALLOWED_HOSTS = [os.environ["CLIENT_HOST"]]
@@ -18,7 +21,7 @@ STATIC_URL = "/static/"
 CSRF_COOKIE_SECURE = False if settings.DEBUG else True
 SESSION_COOKIE_SECURE = False if settings.DEBUG else True
 SECURE_PROXY_SSL_HEADER = None if settings.DEBUG else ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = None if settings.DEBUG else True
+SECURE_SSL_REDIRECT = False if settings.DEBUG else True
 
 INSTALLED_APPS = [
     "django.contrib.admin",

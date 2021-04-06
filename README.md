@@ -71,3 +71,21 @@ Relay requires a pre-defined schema in order to compile. To export a schema, run
 ## GraphiQL
 
 Graphiql is a UI interface that allows us to easily test queries. After starting up the django server (`pipenv run python manage.py runserver`), you can visit `localhost:8000/graphql` to query the API.
+
+# Testing
+
+We use pytest to manage tests. First, install development dependencies by running:
+
+`pipenv install -d`
+
+Then, start the test suite by running:
+
+`pipenv run pytest`
+
+We use pytest-watch to watch for changes and re-run tests on change. To start pytest-watch, run:
+
+`pipenv run ptw`
+
+I have run into problems with OS events not reporting correctly and the tests not being re-run after a save. If this occurs, you can use polling with a `-p` as well.
+
+`pipenv run ptw -p`

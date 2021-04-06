@@ -8,6 +8,7 @@ class Question(models.Model):
     citation_url = models.CharField(max_length=512)
     citation_title = models.CharField(max_length=512)
     citation_image_url = models.CharField(max_length=512)
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="questions")
 
     def __str__(self):
         return self.text
@@ -31,6 +32,7 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name="answers"
     )
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="answers")
 
     def __str__(self):
         return "[%s] %s" % (self.get_answer_display(), self.text)
