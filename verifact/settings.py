@@ -4,11 +4,11 @@ from django.conf import settings
 
 from verifact.utils import cast_boolean
 
-DEBUG = True
+DEBUG = cast_boolean(os.environ.get("DEBUG", False))
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["SECRET_KEY"]
-#ALLOWED_HOSTS = [os.environ["CLIENT_HOST"]]
-#CORS_ALLOWED_ORIGINS = [os.environ["CLIENT_ORIGIN"]]
+ALLOWED_HOSTS = [os.environ["CLIENT_HOST"]]
+CORS_ALLOWED_ORIGINS = [os.environ["CLIENT_ORIGIN"]]
 ROOT_URLCONF = "verifact.urls"
 WSGI_APPLICATION = "verifact.wsgi.application"
 LANGUAGE_CODE = "en-us"

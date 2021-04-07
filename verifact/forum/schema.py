@@ -120,7 +120,7 @@ class AnswerCreate(ClientIDMutation):
                 raise
         except AssertionError as ae:
             if str(ae).startswith("Must receive a QuestionNode id."):
-                raise GraphQLError(error_strings.QUESTION_ID_INVALID)
+                raise GraphQLError(error_strings.ANSWER_QUESTION_ID_INVALID)
             else:
                 raise
 
@@ -165,7 +165,7 @@ class VoteUpdate(ClientIDMutation):
                     )
             except AssertionError as ae:
                 if str(ae).startswith("Must receive an AnswerNode id."):
-                    raise GraphQLError(error_strings.ANSWER_ID_INVALID)
+                    raise GraphQLError(error_strings.VOTE_ANSWER_ID_INVALID)
                 else:
                     raise
 
