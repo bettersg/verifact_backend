@@ -134,8 +134,7 @@ class VoteUpdate(ClientIDMutation):
         credible = Boolean() # if null, remove vote!
         answer_id = ID()
 
-
-    #@login_required
+    @login_required
     def mutate_and_get_payload(
         self,
         info,
@@ -145,33 +144,19 @@ class VoteUpdate(ClientIDMutation):
         credible = kwargs.get('credible',None)
         vote=None
         viewer = info.context.user
-        print(viewer,answer_id,credible)
-        try:
-            print("TRY GET VOTE")
+        try: # control flow could have been simpler -> if exists, delete, then create. but chose to do it this way for atomicity.
             intansid = Node.get_node_from_global_id(
                 info,answer_id,only_type=AnswerNode
             ).id
             vote = Vote.objects.get(user=viewer,answer=intansid) # throws ObjectDoesNotExist if none found
-            print("GOT VOTE")
             if credible is None: # if vote null, delete
                 vote.delete()
             else:
-                print("CHANGING VOTE")
-                print(vote.credible)
                 vote.credible = credible
                 vote.save()
-                print(vote.credible)
-
         except ObjectDoesNotExist as dne:
-            print("DIDNT GET VOTE")
             try:
                 if credible is not None:
-                    print(credible)
-                    print(answer_id,viewer)
-                    testlol = Node.get_node_from_global_id(
-                        info, "QW5zd2VyTm9kZTox", only_type=AnswerNode
-                    )
-                    print(testlol)
                     vote = Vote.objects.create(
                         user=viewer,
                         answer=Node.get_node_from_global_id(
@@ -179,14 +164,12 @@ class VoteUpdate(ClientIDMutation):
                         ),
                         credible=credible
                     )
-                    print(vote)
-
             except AssertionError as ae:
-                print("DID THIS FAIL")
                 if str(ae).startswith("Must receive an AnswerNode id."):
                     raise GraphQLError(error_strings.ANSWER_ID_INVALID)
                 else:
                     raise
+
         return VoteUpdate(vote=vote)
 
 
