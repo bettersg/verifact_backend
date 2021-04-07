@@ -36,7 +36,5 @@ class Answer(factory.django.DjangoModelFactory):
     text = factory.Faker("paragraph")
     citation_url = factory.Faker("url")
     citation_title = factory.Faker("sentence")
-    credible_count = factory.LazyAttribute(lambda a: random.randrange(10))
-    not_credible_count = factory.LazyAttribute(lambda a: random.randrange(10))
     question = None
     user = None
