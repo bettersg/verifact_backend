@@ -121,7 +121,7 @@ class AnswerCreate(ClientIDMutation):
 
         return AnswerCreate(answer=answer)
 
-class VoteUpdate(ClientIDMutation):
+class VoteCreateUpdateDelete(ClientIDMutation):
     vote = Field(VoteNode)
 
     class Input:
@@ -162,10 +162,10 @@ class VoteUpdate(ClientIDMutation):
                 )
 
 
-        return VoteUpdate(vote=vote)
+        return VoteCreateUpdateDelete(vote=vote)
 
 
 class Mutation(ObjectType):
     question_create = QuestionCreate.Field()
     answer_create = AnswerCreate.Field()
-    vote_update = VoteUpdate.Field()
+    vote_update = VoteCreateUpdateDelete.Field()
