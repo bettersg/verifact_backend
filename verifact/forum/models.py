@@ -44,3 +44,12 @@ class Answer(models.Model):
                 check=models.Q(answer__in=["True", "False", "Neither"])
             )
         ]
+
+class Vote(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="votes")
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE,related_name="votes")
+    credible = models.BooleanField(null=True)
+
+    def __str__(self):
+        return f"{self.credible}:{self.answer.text}"

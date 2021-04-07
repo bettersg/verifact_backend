@@ -1,15 +1,15 @@
-from graphene import relay, ObjectType, String, Field, ID
+from graphene import relay, ObjectType, String, Field, ID, Boolean
 from graphene.relay import Node, ClientIDMutation
 from graphene_django import DjangoObjectType
 import base64
 from graphql import GraphQLError
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from graphql_jwt.decorators import login_required
 
 from .. import error_strings
-from .models import Question, Answer
+from .models import Question, Answer, Vote
 from verifact.graph.scalars import Url
-
 
 class QuestionNode(DjangoObjectType):
     class Meta:
@@ -23,20 +23,27 @@ class AnswerNode(DjangoObjectType):
         interfaces = (relay.Node,)
         convert_choices_to_enum = False
 
+class VoteNode(DjangoObjectType):
+    class Meta:
+        model = Vote
+        interfaces = (relay.Node,)
 
 class QuestionConnection(relay.Connection):
     class Meta:
         node = QuestionNode
 
-
 class AnswerConnection(relay.Connection):
     class Meta:
         node = AnswerNode
 
+class VoteConnection(relay.Connection):
+    class Meta:
+        node = VoteNode
 
 class Query(ObjectType):
     questions = relay.ConnectionField(QuestionConnection)
     answers = relay.ConnectionField(AnswerConnection)
+    votes = relay.ConnectionField(VoteConnection)
 
     def resolve_questions(root, info):
         return Question.objects.all()
@@ -44,6 +51,8 @@ class Query(ObjectType):
     def resolve_answers(root, info):
         return Answer.objects.all()
 
+    def resolve_votes(root, info):
+        return Vote.objects.all()
 
 class QuestionCreate(ClientIDMutation):
     question = Field(QuestionNode)
@@ -118,7 +127,70 @@ class AnswerCreate(ClientIDMutation):
 
         return AnswerCreate(answer=answer)
 
+class VoteUpdate(ClientIDMutation):
+    vote = Field(VoteNode)
+
+    class Input:
+        credible = Boolean() # if null, remove vote!
+        answer_id = ID()
+
+
+    #@login_required
+    def mutate_and_get_payload(
+        self,
+        info,
+        answer_id,
+        **kwargs
+    ):
+        credible = kwargs.get('credible',None)
+        vote=None
+        viewer = info.context.user
+        print(viewer,answer_id,credible)
+        try:
+            print("TRY GET VOTE")
+            intansid = Node.get_node_from_global_id(
+                info,answer_id,only_type=AnswerNode
+            ).id
+            vote = Vote.objects.get(user=viewer,answer=intansid) # throws ObjectDoesNotExist if none found
+            print("GOT VOTE")
+            if credible is None: # if vote null, delete
+                vote.delete()
+            else:
+                print("CHANGING VOTE")
+                print(vote.credible)
+                vote.credible = credible
+                vote.save()
+                print(vote.credible)
+
+        except ObjectDoesNotExist as dne:
+            print("DIDNT GET VOTE")
+            try:
+                if credible is not None:
+                    print(credible)
+                    print(answer_id,viewer)
+                    testlol = Node.get_node_from_global_id(
+                        info, "QW5zd2VyTm9kZTox", only_type=AnswerNode
+                    )
+                    print(testlol)
+                    vote = Vote.objects.create(
+                        user=viewer,
+                        answer=Node.get_node_from_global_id(
+                            info, answer_id, only_type=AnswerNode
+                        ),
+                        credible=credible
+                    )
+                    print(vote)
+
+            except AssertionError as ae:
+                print("DID THIS FAIL")
+                if str(ae).startswith("Must receive an AnswerNode id."):
+                    raise GraphQLError(error_strings.ANSWER_ID_INVALID)
+                else:
+                    raise
+        return VoteUpdate(vote=vote)
+
 
 class Mutation(ObjectType):
     question_create = QuestionCreate.Field()
     answer_create = AnswerCreate.Field()
+    vote_update = VoteUpdate.Field()
