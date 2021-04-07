@@ -105,8 +105,7 @@ class AnswerCreate(ClientIDMutation):
                 text=text,
                 citation_url=citation_url,
                 citation_title=citation_title,
-                credible_count=0,
-                not_credible_count=0,
+
                 question=Node.get_node_from_global_id(
                     info, question_id, only_type=QuestionNode
                 ),

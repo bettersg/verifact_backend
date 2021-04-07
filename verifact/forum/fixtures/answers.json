@@ -8,8 +8,6 @@
           "text": "It's a bit more nuanced than that - blablabla",
           "citation_url": "www.google.com",
           "citation_title": "Google",
-          "credible_count": 12,
-          "not_credible_count": 11,
           "question_id": 2
         }
     },
@@ -22,8 +20,6 @@
           "text": "Yeah man! tralalalala",
           "citation_url": "www.bing.com",
           "citation_title": "Bing",
-          "credible_count": 2,
-          "not_credible_count": 8,
           "question_id": 2
         }
     },
@@ -36,8 +32,6 @@
           "text": "It'll ultimately depend on each country's ....",
           "citation_url": "www.google.com",
           "citation_title": "Google",
-          "credible_count": 55,
-          "not_credible_count": 3,
           "question_id": 1
         }
     }
