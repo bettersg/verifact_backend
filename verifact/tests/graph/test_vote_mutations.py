@@ -133,7 +133,7 @@ def test_vote_crud_when_logged_out_returns_permissions_error():
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
     }}
-    if variables not None:
+    if vote_credible is not None:
         variables["input"]["credible"] = vote_credible
 
     res = no_auth_query(
