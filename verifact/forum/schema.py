@@ -128,7 +128,7 @@ class VoteCreateUpdateDelete(ClientIDMutation):
         credible = Boolean() # if null, remove vote!
         answer_id = ID(required=True)
 
-    #@login_required
+    @login_required
     def mutate_and_get_payload(
         self,
         info,

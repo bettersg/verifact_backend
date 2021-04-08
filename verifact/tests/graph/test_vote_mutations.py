@@ -69,11 +69,11 @@ def test_vote_update_with_valid_input_returns_vote():
 
     res2 = auth_query(
         viewer,
-        create_mutation % "created_at,credible",
-        variables=variables,
+        create_mutation % "createdAt,credible",
+        variables=variables2,
     )
 
-    assert res2.data["voteCreateUpdateDelete"]["vote"]["created_at"] == vote.created_at
+    assert res2.data["voteCreateUpdateDelete"]["vote"]["createdAt"] == vote.created_at
     assert res2.data["voteCreateUpdateDelete"]["vote"]["credible"] != vote.credible
     assert Vote.objects.first() is not None
 
@@ -106,7 +106,7 @@ def test_vote_delete_with_valid_input_returns_none():
     res2 = auth_query(
         viewer,
         create_mutation % "credible",
-        variables=variables,
+        variables=variables2,
     )
 
     assert res2.data["voteCreateUpdateDelete"]["vote"] == None
