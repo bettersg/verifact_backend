@@ -38,3 +38,12 @@ class Answer(factory.django.DjangoModelFactory):
     citation_title = factory.Faker("sentence")
     question = None
     user = None
+
+class Vote(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Vote
+
+    created_at = factory.LazyFunction(timezone.now)
+    credible = factory.Faker("pybool")
+    user = None
+    answer = None

@@ -128,7 +128,7 @@ class VoteCreateUpdateDelete(ClientIDMutation):
         credible = Boolean() # if null, remove vote!
         answer_id = ID(required=True)
 
-    @login_required
+    #@login_required
     def mutate_and_get_payload(
         self,
         info,
@@ -148,6 +148,7 @@ class VoteCreateUpdateDelete(ClientIDMutation):
         if vote_already_exists:
             if credible is None: # if vote null, delete
                 vote.delete()
+                return VoteCreateUpdateDelete(vote = None)
             else:
                 vote.credible = credible
                 vote.save()
@@ -168,4 +169,4 @@ class VoteCreateUpdateDelete(ClientIDMutation):
 class Mutation(ObjectType):
     question_create = QuestionCreate.Field()
     answer_create = AnswerCreate.Field()
-    vote_update = VoteCreateUpdateDelete.Field()
+    vote_create_update_delete = VoteCreateUpdateDelete.Field()
