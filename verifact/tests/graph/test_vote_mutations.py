@@ -22,9 +22,10 @@ create_mutation = """
 def test_vote_create_with_valid_input_returns_vote():
     user = factories.User()
     viewer = factories.User()
-    vote = factories.Vote.build()
     question = factories.Question(user=user)
-    answer = factories.Answer(question=question)
+    answer = factories.Answer(question=question,user=user)
+    vote = factories.Vote(user=user,answer=answer)
+
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
         "credible": vote.credible,
@@ -43,9 +44,10 @@ def test_vote_create_with_valid_input_returns_vote():
 def test_vote_update_with_valid_input_returns_vote():
     user = factories.User()
     viewer = factories.User()
-    vote = factories.Vote.build()
     question = factories.Question(user=user)
-    answer = factories.Answer(question=question)
+    answer = factories.Answer(question=question,user=user)
+    vote = factories.Vote(user=user,answer=answer)
+
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
         "credible": vote.credible,
@@ -79,9 +81,10 @@ def test_vote_update_with_valid_input_returns_vote():
 def test_vote_delete_with_valid_input_returns_none():
     user = factories.User()
     viewer = factories.User()
-    vote = factories.Vote.build()
     question = factories.Question(user=user)
-    answer = factories.Answer(question=question)
+    answer = factories.Answer(question=question,user=user)
+    vote = factories.Vote(user=user,answer=answer)
+
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
         "credible": vote.credible,
@@ -111,9 +114,10 @@ def test_vote_delete_with_valid_input_returns_none():
     # if attempting to delete a vote that doesn't exist, nothing should happen
     user3 = factories.User()
     viewer3 = factories.User()
-    vote3 = factories.Vote.build()
     question3 = factories.Question(user=user3)
-    answer3 = factories.Answer(question=question3)
+    answer3 = factories.Answer(question=question3,user=user3)
+    vote3 = factories.Vote(user=user3,answer=answer3)
+
     variables3 = {"input": {
         "answerId": to_global_id("AnswerNode", answer3.id),
     }}
@@ -132,7 +136,7 @@ def test_vote_crud_when_logged_out_returns_permissions_error():
     user = factories.User()
     viewer = factories.User()
     question = factories.Question(user=user)
-    answer = factories.Answer(question=question)
+    answer = factories.Answer(question=question,user=user)
     vote_credible = random.choice([True,False,None])
 
     variables = {"input": {
