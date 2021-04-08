@@ -55,7 +55,7 @@ def test_vote_update_with_valid_input_returns_vote():
 
     res = auth_query(
         viewer,
-        create_mutation % "credible",
+        create_mutation % "createdAt,credible",
         variables=variables,
     )
 
@@ -73,8 +73,8 @@ def test_vote_update_with_valid_input_returns_vote():
         variables=variables2,
     )
 
-    assert res2.data["voteCreateUpdateDelete"]["vote"]["createdAt"] == vote.created_at
-    assert res2.data["voteCreateUpdateDelete"]["vote"]["credible"] != vote.credible
+    assert res2.data["voteCreateUpdateDelete"]["vote"]["createdAt"] == res.data["voteCreateUpdateDelete"]["vote"]["createdAt"]
+    assert res2.data["voteCreateUpdateDelete"]["vote"]["credible"] != res.data["voteCreateUpdateDelete"]["vote"]["credible"]
     assert Vote.objects.first() is not None
 
 @pytest.mark.django_db
