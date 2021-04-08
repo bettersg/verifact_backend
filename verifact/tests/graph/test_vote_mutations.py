@@ -33,7 +33,7 @@ def test_vote_create_with_valid_input_returns_vote():
 
     res = auth_query(
         viewer,
-        create_mutation % "vote",
+        create_mutation % "credible",
         variables=variables,
     )
 
@@ -55,7 +55,7 @@ def test_vote_update_with_valid_input_returns_vote():
 
     res = auth_query(
         viewer,
-        create_mutation % "vote",
+        create_mutation % "credible",
         variables=variables,
     )
 
@@ -69,7 +69,7 @@ def test_vote_update_with_valid_input_returns_vote():
 
     res2 = auth_query(
         viewer,
-        create_mutation % "vote",
+        create_mutation % "created_at,credible",
         variables=variables,
     )
 
@@ -92,7 +92,7 @@ def test_vote_delete_with_valid_input_returns_none():
 
     res = auth_query(
         viewer,
-        create_mutation % "vote",
+        create_mutation % "credible",
         variables=variables,
     )
 
@@ -105,7 +105,7 @@ def test_vote_delete_with_valid_input_returns_none():
 
     res2 = auth_query(
         viewer,
-        create_mutation % "vote",
+        create_mutation % "credible",
         variables=variables,
     )
 
@@ -124,7 +124,7 @@ def test_vote_delete_with_valid_input_returns_none():
 
     res3 = auth_query(
         viewer3,
-        create_mutation % "vote",
+        create_mutation % "credible",
         variables=variables3,
     )
 
@@ -146,7 +146,7 @@ def test_vote_crud_when_logged_out_returns_permissions_error():
         variables["input"]["credible"] = vote_credible
 
     res = no_auth_query(
-        create_mutation % "vote",
+        create_mutation % "credible",
         variables=variables,
     )
     assert res.errors[0].message == PermissionDenied.default_message
