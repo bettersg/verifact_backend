@@ -95,7 +95,8 @@ def test_vote_delete_with_valid_input_returns_none():
         variables=variables,
     )
 
-    assert vote is None
+    assert Vote.objects.first() is None
+
 
 @pytest.mark.django_db
 def test_vote_crud_when_logged_out_returns_permissions_error():

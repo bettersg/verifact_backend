@@ -150,7 +150,7 @@ class VoteCreateUpdateDelete(ClientIDMutation):
             if credible is not None:
                 vote = Vote.objects.create(
                     user=viewer,
-                    answer=Answer.objects.get(answer=answer_pk), # Cleaner Django ORM API
+                    answer=Answer.objects.get(id=answer_pk),
                     credible=credible
                 )
 
