@@ -24,7 +24,7 @@ def test_vote_create_with_valid_input_returns_vote():
     viewer = factories.User()
     question = factories.Question(user=user)
     answer = factories.Answer(question=question,user=user)
-    vote = factories.Vote(user=user,answer=answer)
+    vote = factories.Vote.build(user=viewer,answer=answer)
 
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
@@ -46,7 +46,7 @@ def test_vote_update_with_valid_input_returns_vote():
     viewer = factories.User()
     question = factories.Question(user=user)
     answer = factories.Answer(question=question,user=user)
-    vote = factories.Vote(user=user,answer=answer)
+    vote = factories.Vote(user=viewer,answer=answer)
 
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
@@ -83,7 +83,7 @@ def test_vote_delete_with_valid_input_returns_none():
     viewer = factories.User()
     question = factories.Question(user=user)
     answer = factories.Answer(question=question,user=user)
-    vote = factories.Vote(user=user,answer=answer)
+    vote = factories.Vote(user=viewer,answer=answer)
 
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
@@ -95,7 +95,7 @@ def test_vote_delete_with_valid_input_returns_none():
         variables=variables,
     )
 
-    assert res.data["voteCreateUpdateDelete"]["vote"] is None
+    assert Vote.objects.count() == 0
 
 @pytest.mark.django_db
 def test_vote_crud_when_logged_out_returns_permissions_error():
