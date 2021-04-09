@@ -91,12 +91,11 @@ def test_vote_delete_with_valid_input_returns_none():
 
     res = auth_query(
         viewer,
-        create_mutation % "credible",
+        create_mutation % "id",
         variables=variables,
     )
 
-    assert Vote.objects.first() is None
-
+    assert res.data["voteCreateUpdateDelete"]["vote"] is None
 
 @pytest.mark.django_db
 def test_vote_crud_when_logged_out_returns_permissions_error():
