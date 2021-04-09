@@ -136,32 +136,23 @@ class VoteCreateUpdateDelete(ClientIDMutation):
         **kwargs
     ):
         credible = kwargs.get('credible',None)
-        vote=None
         viewer = info.context.user
         answer_pk = from_global_id(answer_id)[1]
-        vote_already_exists = True
+        vote=None
         try:
             vote = Vote.objects.get(user=viewer,answer=answer_pk)
-        except ObjectDoesNotExist as dne:
-            vote_already_exists = False
-
-        if vote_already_exists:
-            if credible is None: # if vote null, delete
+            if credible is None:
                 vote.delete()
-                return VoteCreateUpdateDelete(vote = None)
             else:
                 vote.credible = credible
                 vote.save()
-        else:
+        except ObjectDoesNotExist:
             if credible is not None:
                 vote = Vote.objects.create(
                     user=viewer,
-                    answer=Node.get_node_from_global_id(
-                        info, answer_id, only_type=AnswerNode
-                    ),
+                    answer=Answer.objects.get(answer=answer_pk), # Cleaner Django ORM API
                     credible=credible
                 )
-
 
         return VoteCreateUpdateDelete(vote=vote)
 

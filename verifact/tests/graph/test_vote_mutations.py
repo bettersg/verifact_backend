@@ -87,7 +87,6 @@ def test_vote_delete_with_valid_input_returns_none():
 
     variables = {"input": {
         "answerId": to_global_id("AnswerNode", answer.id),
-        "credible": vote.credible,
     }}
 
     res = auth_query(
@@ -96,40 +95,7 @@ def test_vote_delete_with_valid_input_returns_none():
         variables=variables,
     )
 
-    assert res.data["voteCreateUpdateDelete"]["vote"]["credible"] == vote.credible
-    assert Vote.objects.first() is not None
-
-    variables2 = {"input": {
-        "answerId": to_global_id("AnswerNode", answer.id),
-    }}
-
-    res2 = auth_query(
-        viewer,
-        create_mutation % "credible",
-        variables=variables2,
-    )
-
-    assert res2.data["voteCreateUpdateDelete"]["vote"] == None
-
-    # if attempting to delete a vote that doesn't exist, nothing should happen
-    user3 = factories.User()
-    viewer3 = factories.User()
-    question3 = factories.Question(user=user3)
-    answer3 = factories.Answer(question=question3,user=user3)
-    vote3 = factories.Vote(user=user3,answer=answer3)
-
-    variables3 = {"input": {
-        "answerId": to_global_id("AnswerNode", answer3.id),
-    }}
-
-    res3 = auth_query(
-        viewer3,
-        create_mutation % "credible",
-        variables=variables3,
-    )
-
-    assert res3.data["voteCreateUpdateDelete"]["vote"] == None
-
+    assert vote is None
 
 @pytest.mark.django_db
 def test_vote_crud_when_logged_out_returns_permissions_error():
