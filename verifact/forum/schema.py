@@ -42,8 +42,6 @@ class VoteConnection(relay.Connection):
 
 class Query(ObjectType):
     questions = relay.ConnectionField(QuestionConnection)
-    answers = relay.ConnectionField(AnswerConnection)
-    votes = relay.ConnectionField(VoteConnection)
 
     def resolve_questions(root, info):
         return Question.objects.all()
