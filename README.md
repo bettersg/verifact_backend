@@ -37,6 +37,9 @@ If you see errors relating to psycopg2, common problems include linking ssl libr
 
 Once the installation succeeds, you can move on to migrating the database.
 
+### Additional for offline setup
+- Duplicate .env.test as .env 
+
 #### Migrate the database
 
 - `pipenv run python manage.py migrate` - You'll need to do this whenever the database has changes
