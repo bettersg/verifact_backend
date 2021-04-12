@@ -1,4 +1,4 @@
-from graphene import relay, ObjectType, String, Field, ID, Boolean
+from graphene import relay, ObjectType, String, Field, ID, Boolean, List
 from graphene.relay import Node, ClientIDMutation
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
@@ -8,14 +8,23 @@ from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from graphql_jwt.decorators import login_required
 from .. import error_strings
-from .models import Question, Answer, Vote
+from .models import Question, Answer, Vote, Citation
 from verifact.graph.scalars import Url
+
+
+class CitationNode(DjangoObjectType):
+    class Meta:
+        model = Citation
+        interfaces = (relay.Node,)
 
 class QuestionNode(DjangoObjectType):
     class Meta:
         model = Question
         interfaces = (relay.Node,)
 
+    citations = List(CitationNode)
+    def resolve_citations(self, args):
+        return self.citations.all()
 
 class AnswerNode(DjangoObjectType):
     class Meta:
@@ -23,10 +32,18 @@ class AnswerNode(DjangoObjectType):
         interfaces = (relay.Node,)
         convert_choices_to_enum = False
 
+    citations = List(CitationNode)
+    def resolve_citations(self, args):
+        return self.citations.all()
+
 class VoteNode(DjangoObjectType):
     class Meta:
         model = Vote
         interfaces = (relay.Node,)
+
+class CitationConnection(relay.Connection):
+    class Meta:
+        node = CitationNode
 
 class QuestionConnection(relay.Connection):
     class Meta:

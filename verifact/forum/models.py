@@ -3,12 +3,26 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
+class Citation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="citations")
+    citation_url = models.CharField(max_length=2048)
+    citation_title = models.CharField(max_length=2048)
+    citation_image_url = models.CharField(max_length=2048)
+
+    parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    parent_pk = models.PositiveIntegerField()
+    parent_object = GenericForeignKey('parent_type', 'parent_pk')
+
+    def __str__(self):
+        return f"{self.citation_url}"
+
 
 class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     text = models.CharField(max_length=2048)
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="questions")
-    citations = GenericRelation(Citation, related_query_name="question")
+    citations = GenericRelation(Citation, related_query_name="question",object_id_field='parent_pk', content_type_field='parent_type')
     def __str__(self):
         return self.text
 
@@ -28,7 +42,7 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name="answers"
     )
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="answers")
-    citations = GenericRelation(Citation, related_query_name="answer")
+    citations = GenericRelation(Citation, related_query_name="answer",object_id_field='parent_pk', content_type_field='parent_type')
 
     def __str__(self):
         return "[%s] %s" % (self.get_answer_display(), self.text)
@@ -49,17 +63,3 @@ class Vote(models.Model):
 
     def __str__(self):
         return f"{self.credible}:{self.answer.text}"
-
-class Citation(model.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="citations")
-    citation_url = models.CharField(max_length=2048)
-    citation_title = models.CharField(max_length=2048)
-    citation_image_url = models.CharField(max_length=2048)
-
-    parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    parent_pk = models.PositiveIntegerField()
-    parent_object = GenericForeignKey('parent_type', 'parent_pk')
-
-    def __str__(self):
-        return f"{self.citation_url}"
