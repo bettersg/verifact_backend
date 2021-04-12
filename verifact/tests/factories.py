@@ -21,9 +21,6 @@ class Question(factory.django.DjangoModelFactory):
 
     created_at = factory.LazyFunction(timezone.now)
     text = factory.Faker("paragraph")
-    citation_url = factory.Faker("url")
-    citation_title = factory.Faker("sentence")
-    citation_image_url = factory.Faker("image_url")
     user = None
 
 
@@ -32,12 +29,13 @@ class Answer(factory.django.DjangoModelFactory):
         model = models.Answer
 
     created_at = factory.LazyFunction(timezone.now)
-    answer = factory.LazyAttribute(lambda a: random.choice(["True", "False", "Neither"]))
+    answer = factory.LazyAttribute(
+        lambda a: random.choice(["True", "False", "Neither"])
+    )
     text = factory.Faker("paragraph")
-    citation_url = factory.Faker("url")
-    citation_title = factory.Faker("sentence")
     question = None
     user = None
+
 
 class Vote(factory.django.DjangoModelFactory):
     class Meta:
@@ -47,3 +45,15 @@ class Vote(factory.django.DjangoModelFactory):
     credible = factory.Faker("pybool")
     user = None
     answer = None
+
+
+class Citation(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Citation
+
+    created_at = factory.LazyFunction(timezone.now)
+    user = None
+    parent_object = None
+    citation_image_url = None
+    citation_title = None
+    citation_url = factory.Faker("url")

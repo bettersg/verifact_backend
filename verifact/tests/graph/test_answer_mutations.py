@@ -27,8 +27,6 @@ def test_answer_create_with_valid_input_returns_answer():
     variables = {"input": {
         "answer": answer.answer,
         "text": answer.text,
-        "citationUrl": answer.citation_url,
-        "citationTitle": answer.citation_title,
         "questionId": to_global_id("QuestionNode", question.id),
     }}
     res = auth_query(
@@ -47,8 +45,6 @@ def test_answer_create_when_logged_out_returns_permissions_error():
     variables = {"input": {
         "answer": answer.answer,
         "text": answer.text,
-        "citationUrl": answer.citation_url,
-        "citationTitle": answer.citation_title,
         "questionId": to_global_id("QuestionNode", question.id),
     }}
     res = no_auth_query(

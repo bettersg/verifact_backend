@@ -180,7 +180,6 @@ class CitationCreate(ClientIDMutation):
         parent_pk = from_global_id(parent_id)[1]
 
         parent_class = None
-        print(parent_type)
         if parent_type == "QuestionNode":
             parent_class = Question
         elif parent_type == "AnswerNode":
@@ -192,14 +191,13 @@ class CitationCreate(ClientIDMutation):
 
         try:
             url_content = requests.get(citation_url,headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0'}).content
-            url_soup = BeautifulSoup(url_content)
-            print(url_soup)
+            url_soup = BeautifulSoup(url_content,features="html.parser")
             citation_image_url = url_soup.find("meta",{"property":"og:image","content":True})['content']
             citation_title = url_soup.find("meta",{"property":"og:title","content":True})['content']
         except (TypeError, requests.exceptions.RequestException) as e:
-            print(e)
             citation_image_url = "https://d1nhio0ox7pgb.cloudfront.net/_img/o_collection_png/green_dark_grey/256x256/plain/symbol_questionmark.png"
             citation_title = f"Site: {urlparse(citation_url).netloc}"
+
 
         citation = Citation.objects.create(
             user=viewer,
