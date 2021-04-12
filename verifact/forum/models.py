@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -8,7 +8,7 @@ class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     text = models.CharField(max_length=2048)
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="questions")
-
+    citations = GenericRelation(Citation, related_query_name="question")
     def __str__(self):
         return self.text
 
@@ -28,6 +28,7 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name="answers"
     )
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="answers")
+    citations = GenericRelation(Citation, related_query_name="answer")
 
     def __str__(self):
         return "[%s] %s" % (self.get_answer_display(), self.text)
