@@ -1,13 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     text = models.CharField(max_length=2048)
-    citation_url = models.CharField(max_length=512)
-    citation_title = models.CharField(max_length=512)
-    citation_image_url = models.CharField(max_length=512)
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="questions")
 
     def __str__(self):
@@ -25,8 +24,6 @@ class Answer(models.Model):
         max_length=8,
     )
     text = models.CharField(max_length=2048)
-    citation_url = models.CharField(max_length=2048)
-    citation_title = models.CharField(max_length=2048)
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name="answers"
     )
@@ -51,3 +48,17 @@ class Vote(models.Model):
 
     def __str__(self):
         return f"{self.credible}:{self.answer.text}"
+
+class Citation(model.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="citations")
+    citation_url = models.CharField(max_length=2048)
+    citation_title = models.CharField(max_length=2048)
+    citation_image_url = models.CharField(max_length=2048)
+
+    parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    parent_pk = models.PositiveIntegerField()
+    parent_object = GenericForeignKey('parent_type', 'parent_pk')
+
+    def __str__(self):
+        return f"{self.citation_url}"
