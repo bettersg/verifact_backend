@@ -10,6 +10,9 @@ from graphql_jwt.decorators import login_required
 from .. import error_strings
 from .models import Question, Answer, Vote, Citation
 from verifact.graph.scalars import Url
+from bs4 import BeautifulSoup
+import requests
+from urllib.parse import urlparse
 
 
 class CitationNode(DjangoObjectType):
@@ -69,20 +72,14 @@ class QuestionCreate(ClientIDMutation):
 
     class Input:
         text = String(required=True)
-        citation_url = Url(required=True)
-        citation_title = String()
-        citation_image_url = Url()
 
     @login_required
     def mutate_and_get_payload(
-        self, info, text, citation_url, citation_title="", citation_image_url=""
+        self, info, text,
     ):
         viewer = info.context.user
         question = Question.objects.create(
             text=text,
-            citation_url=citation_url,
-            citation_title=citation_title,
-            citation_image_url=citation_image_url,
             user=viewer
         )
         return QuestionCreate(question=question)
@@ -94,8 +91,6 @@ class AnswerCreate(ClientIDMutation):
     class Input:
         answer = String(required=True)
         text = String()
-        citation_url = Url()
-        citation_title = String()
         question_id = ID(required=True)
 
     @login_required
@@ -105,17 +100,12 @@ class AnswerCreate(ClientIDMutation):
         answer,
         text,
         question_id,
-        citation_url="",
-        citation_title="",
     ):
         viewer = info.context.user
         try:
             answer = Answer.objects.create(
                 answer=answer,
                 text=text,
-                citation_url=citation_url,
-                citation_title=citation_title,
-
                 question=Node.get_node_from_global_id(
                     info, question_id, only_type=QuestionNode
                 ),
@@ -171,8 +161,59 @@ class VoteCreateUpdateDelete(ClientIDMutation):
 
         return VoteCreateUpdateDelete(vote=vote)
 
+class CitationCreate(ClientIDMutation):
+    citation = Field(CitationNode)
+
+    class Input:
+        citation_url = Url(required=True)
+        parent_id = ID(required=True)
+
+    @login_required
+    def mutate_and_get_payload(
+        self,
+        info,
+        citation_url,
+        parent_id
+    ):
+        viewer = info.context.user
+        parent_type = from_global_id(parent_id)[0]
+        parent_pk = from_global_id(parent_id)[1]
+
+        parent_class = None
+        print(parent_type)
+        if parent_type == "QuestionNode":
+            parent_class = Question
+        elif parent_type == "AnswerNode":
+            parent_class = Answer
+        else:
+            raise GraphQLError(error_strings.CITATION_PARENT_MUST_BE_QUESTION_ANSWER)
+
+        parent_object = parent_class.objects.get(id=parent_pk)
+
+        try:
+            url_content = requests.get(citation_url,headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0'}).content
+            url_soup = BeautifulSoup(url_content)
+            print(url_soup)
+            citation_image_url = url_soup.find("meta",{"property":"og:image","content":True})['content']
+            citation_title = url_soup.find("meta",{"property":"og:title","content":True})['content']
+        except (TypeError, requests.exceptions.RequestException) as e:
+            print(e)
+            citation_image_url = "https://d1nhio0ox7pgb.cloudfront.net/_img/o_collection_png/green_dark_grey/256x256/plain/symbol_questionmark.png"
+            citation_title = f"Site: {urlparse(citation_url).netloc}"
+
+        citation = Citation.objects.create(
+            user=viewer,
+            citation_url=citation_url,
+            citation_image_url=citation_image_url,
+            citation_title=citation_title,
+            parent_object=parent_object,
+        )
+
+
+        return CitationCreate(citation=citation)
 
 class Mutation(ObjectType):
     question_create = QuestionCreate.Field()
     answer_create = AnswerCreate.Field()
     vote_create_update_delete = VoteCreateUpdateDelete.Field()
+    citation_create = CitationCreate.Field()
