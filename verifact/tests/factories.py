@@ -36,7 +36,14 @@ class Answer(factory.django.DjangoModelFactory):
     text = factory.Faker("paragraph")
     citation_url = factory.Faker("url")
     citation_title = factory.Faker("sentence")
-    credible_count = factory.LazyAttribute(lambda a: random.randrange(10))
-    not_credible_count = factory.LazyAttribute(lambda a: random.randrange(10))
     question = None
     user = None
+
+class Vote(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Vote
+
+    created_at = factory.LazyFunction(timezone.now)
+    credible = factory.Faker("pybool")
+    user = None
+    answer = None

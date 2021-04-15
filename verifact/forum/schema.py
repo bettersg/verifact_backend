@@ -1,15 +1,15 @@
-from graphene import relay, ObjectType, String, Field, ID
+from graphene import relay, ObjectType, String, Field, ID, Boolean
 from graphene.relay import Node, ClientIDMutation
+from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
 import base64
 from graphql import GraphQLError
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from graphql_jwt.decorators import login_required
-
 from .. import error_strings
-from .models import Question, Answer
+from .models import Question, Answer, Vote
 from verifact.graph.scalars import Url
-
 
 class QuestionNode(DjangoObjectType):
     class Meta:
@@ -23,26 +23,28 @@ class AnswerNode(DjangoObjectType):
         interfaces = (relay.Node,)
         convert_choices_to_enum = False
 
+class VoteNode(DjangoObjectType):
+    class Meta:
+        model = Vote
+        interfaces = (relay.Node,)
 
 class QuestionConnection(relay.Connection):
     class Meta:
         node = QuestionNode
 
-
 class AnswerConnection(relay.Connection):
     class Meta:
         node = AnswerNode
 
+class VoteConnection(relay.Connection):
+    class Meta:
+        node = VoteNode
 
 class Query(ObjectType):
     questions = relay.ConnectionField(QuestionConnection)
-    answers = relay.ConnectionField(AnswerConnection)
 
     def resolve_questions(root, info):
         return Question.objects.all()
-
-    def resolve_answers(root, info):
-        return Answer.objects.all()
 
 
 class QuestionCreate(ClientIDMutation):
@@ -77,7 +79,7 @@ class AnswerCreate(ClientIDMutation):
         text = String()
         citation_url = Url()
         citation_title = String()
-        question_id = ID()
+        question_id = ID(required=True)
 
     @login_required
     def mutate_and_get_payload(
@@ -96,8 +98,7 @@ class AnswerCreate(ClientIDMutation):
                 text=text,
                 citation_url=citation_url,
                 citation_title=citation_title,
-                credible_count=0,
-                not_credible_count=0,
+
                 question=Node.get_node_from_global_id(
                     info, question_id, only_type=QuestionNode
                 ),
@@ -112,13 +113,49 @@ class AnswerCreate(ClientIDMutation):
                 raise
         except AssertionError as ae:
             if str(ae).startswith("Must receive a QuestionNode id."):
-                raise GraphQLError(error_strings.QUESTION_ID_INVALID)
+                raise GraphQLError(error_strings.ANSWER_QUESTION_ID_INVALID)
             else:
                 raise
 
         return AnswerCreate(answer=answer)
 
+class VoteCreateUpdateDelete(ClientIDMutation):
+    vote = Field(VoteNode)
+
+    class Input:
+        credible = Boolean() # if null, remove vote!
+        answer_id = ID(required=True)
+
+    @login_required
+    def mutate_and_get_payload(
+        self,
+        info,
+        answer_id,
+        **kwargs
+    ):
+        credible = kwargs.get('credible',None)
+        viewer = info.context.user
+        answer_pk = from_global_id(answer_id)[1]
+        vote=None
+        try:
+            vote = Vote.objects.get(user=viewer,answer=answer_pk)
+            if credible is None:
+                vote.delete()
+            else:
+                vote.credible = credible
+                vote.save()
+        except ObjectDoesNotExist:
+            if credible is not None:
+                vote = Vote.objects.create(
+                    user=viewer,
+                    answer=Answer.objects.get(id=answer_pk),
+                    credible=credible
+                )
+
+        return VoteCreateUpdateDelete(vote=vote)
+
 
 class Mutation(ObjectType):
     question_create = QuestionCreate.Field()
     answer_create = AnswerCreate.Field()
+    vote_create_update_delete = VoteCreateUpdateDelete.Field()
