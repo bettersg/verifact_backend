@@ -38,6 +38,9 @@ If you see errors relating to psycopg2, common problems include linking ssl libr
 Once the installation succeeds, you can move on to migrating the database.
 
 ### Configure local environment
+
+You must have a `.env` file locally to configure certain properties when starting Django. This file is purposefly ignored from our repository, so you must create it locally. To do so, follow the steps below:
+
 - `cp .env.test .env` - Copy .env.test to .env
 - Edit the new `.env` file with your editor of choice
 - Remove `DB_PASSWORD`, we didn't set a password
