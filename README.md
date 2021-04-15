@@ -59,7 +59,7 @@ You must have a `.env` file locally to configure certain properties when startin
 - You can also log into your postgres shell to confirm that it worked by running `psql verifact`, then once in the shell, run `\d` to show all relations. It should show a handful of django relations
 
 #### Preload data
-- `pipenv run python manage.py loaddata questions` - This command loads the data from `verifact/forum/fixtures/questions` into the database.
+- `pipenv run python manage.py loaddata users questions answers votes` - This command loads the specified fixtures from `verifact/forum/fixtures/` into the database. To load specific fixtures, specify those fixtures at the end of the command.
 
 # Formatting style
 
