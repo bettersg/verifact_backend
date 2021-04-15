@@ -37,8 +37,11 @@ If you see errors relating to psycopg2, common problems include linking ssl libr
 
 Once the installation succeeds, you can move on to migrating the database.
 
-### Additional step for local setup
-- Duplicate .env.test as .env 
+### Configure local environment
+- `cp .env.test .env` - Copy .env.test to .env
+- Edit the new `.env` file with your editor of choice
+- Remove `DB_PASSWORD`, we didn't set a password
+- Update `DB_NAME` from `postgres` to `verifact` to match the name we used above
 
 #### Migrate the database
 
