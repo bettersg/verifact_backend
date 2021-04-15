@@ -1,0 +1,44 @@
+[
+    {
+        "model":"forum.answer",
+        "pk":1,
+        "fields":{
+          "created_at": "2020-10-10T17:41:28+00:00",
+          "answer": "Neither",
+          "text": "It's a bit more nuanced than that - blablabla",
+          "citation_url": "www.google.com",
+          "citation_title": "Google",
+          "credible_count": 12,
+          "not_credible_count": 11,
+          "question_id": 2
+        }
+    },
+    {
+        "model":"forum.answer",
+        "pk":2,
+        "fields":{
+          "created_at": "2020-10-10T17:41:28+00:00",
+          "answer": "True",
+          "text": "Yeah man! tralalalala",
+          "citation_url": "www.bing.com",
+          "citation_title": "Bing",
+          "credible_count": 2,
+          "not_credible_count": 8,
+          "question_id": 2
+        }
+    },
+    {
+        "model":"forum.answer",
+        "pk":3,
+        "fields":{
+          "created_at": "2020-10-10T17:41:28+00:00",
+          "answer": "Neither",
+          "text": "It'll ultimately depend on each country's ....",
+          "citation_url": "www.google.com",
+          "citation_title": "Google",
+          "credible_count": 55,
+          "not_credible_count": 3,
+          "question_id": 1
+        }
+    }
+]
