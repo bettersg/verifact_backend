@@ -6,13 +6,14 @@ from django.contrib.contenttypes.models import ContentType
 class Citation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="citations")
-    citation_url = models.CharField(max_length=2048)
-    citation_title = models.CharField(max_length=2048)
-    citation_image_url = models.CharField(max_length=2048)
+    url = models.CharField(max_length=2048)
+    title = models.CharField(max_length=2048)
+    image_url = models.CharField(max_length=2048)
 
-    parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    parent_pk = models.PositiveIntegerField()
-    parent_object = GenericForeignKey('parent_type', 'parent_pk')
+    limit_content = models.Q(app_label="forum", model="answer") | models.Q(app_label="forum", model="question")
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to=limit_content)
+    content_pk = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'content_pk')
 
     def __str__(self):
         return f"{self.citation_url}"
@@ -22,7 +23,7 @@ class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     text = models.CharField(max_length=2048)
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="questions")
-    citations = GenericRelation(Citation, related_query_name="question",object_id_field='parent_pk', content_type_field='parent_type')
+    citations = GenericRelation(Citation, related_query_name="question",object_id_field='content_pk', content_type_field='content_type')
     def __str__(self):
         return self.text
 
@@ -42,7 +43,7 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name="answers"
     )
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="answers")
-    citations = GenericRelation(Citation, related_query_name="answer",object_id_field='parent_pk', content_type_field='parent_type')
+    citations = GenericRelation(Citation, related_query_name="answer",object_id_field='content_pk', content_type_field='content_type')
 
     def __str__(self):
         return "[%s] %s" % (self.get_answer_display(), self.text)
@@ -59,7 +60,7 @@ class Vote(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="votes")
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE,related_name="votes")
-    credible = models.BooleanField(null=True)
+    credible = models.BooleanField()
 
     def __str__(self):
         return f"{self.credible}:{self.answer.text}"
