@@ -28,6 +28,7 @@ def test_answer_create_with_valid_input_returns_answer():
         "answer": answer.answer,
         "text": answer.text,
         "questionId": to_global_id("QuestionNode", question.id),
+        "citationUrls": ["https://ogp.me/"]
     }}
     res = auth_query(
         viewer,
@@ -46,6 +47,7 @@ def test_answer_create_when_logged_out_returns_permissions_error():
         "answer": answer.answer,
         "text": answer.text,
         "questionId": to_global_id("QuestionNode", question.id),
+        "citationUrls": ["https://ogp.me/"]
     }}
     res = no_auth_query(
         create_mutation % "text",
