@@ -169,7 +169,7 @@ class VoteCreateUpdateDelete(ClientIDMutation):
     vote = Field(VoteNode)
 
     class Input:
-        credible = Boolean()  # if null, remove vote!
+        credible = Boolean() # if null, remove vote!
         answer_id = ID(required=True)
 
     @login_required

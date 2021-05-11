@@ -16,7 +16,7 @@ class Citation(models.Model):
     content_object = GenericForeignKey('content_type', 'content_pk')
 
     def __str__(self):
-        return f"{self.citation_url}"
+        return f"{self.url}"
 
 
 class Question(models.Model):
