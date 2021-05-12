@@ -37,6 +37,15 @@ If you see errors relating to psycopg2, common problems include linking ssl libr
 
 Once the installation succeeds, you can move on to migrating the database.
 
+### Configure local environment
+
+You must have a `.env` file locally to configure certain properties when starting Django. This file is purposefly ignored from our repository, so you must create it locally. To do so, follow the steps below:
+
+- `cp .env.test .env` - Copy .env.test to .env
+- Edit the new `.env` file with your editor of choice
+- Remove `DB_PASSWORD`, we didn't set a password
+- Update `DB_NAME` from `postgres` to `verifact` to match the name we used above
+
 #### Migrate the database
 
 - `pipenv run python manage.py migrate` - You'll need to do this whenever the database has changes
@@ -50,7 +59,7 @@ Once the installation succeeds, you can move on to migrating the database.
 - You can also log into your postgres shell to confirm that it worked by running `psql verifact`, then once in the shell, run `\d` to show all relations. It should show a handful of django relations
 
 #### Preload data
-- `pipenv run python manage.py loaddata questions` - This command loads the data from `verifact/forum/fixtures/questions` into the database.
+- `pipenv run python manage.py loaddata users questions answers votes` - This command loads the specified fixtures from `verifact/forum/fixtures/` into the database. To load specific fixtures, specify those fixtures at the end of the command.
 
 # Formatting style
 
