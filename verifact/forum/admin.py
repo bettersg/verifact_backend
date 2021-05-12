@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Answer, Vote
+from .models import Question, Answer, Vote, Citation
 
 
 @admin.register(Question)
@@ -11,5 +11,9 @@ class AnswerAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Vote)
-class AnswerAdmin(admin.ModelAdmin):
+class VoteAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Citation)
+class CitationAdmin(admin.ModelAdmin):
     pass

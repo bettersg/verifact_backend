@@ -11,7 +11,7 @@ handlers:
     script: auto
     secure: always
 
-entrypoint: gunicorn -b :$PORT verifact.wsgi:application && python3 manage.py migrate --noinput
+entrypoint: gunicorn -b :$PORT verifact.wsgi:application
 
 env_variables:
   SECRET_KEY: $SECRET_KEY
