@@ -1,5 +1,5 @@
 from graphene import relay, ObjectType, String, Field, ID, Boolean, List, NonNull
-from graphene.relay import Node, ClientIDMutation
+from graphene.relay import Node, Connection, ConnectionField, ClientIDMutation
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
 import base64
@@ -20,13 +20,18 @@ class CitationNode(DjangoObjectType):
         model = Citation
         interfaces = (relay.Node,)
 
+class CitationConnection(Connection):
+    class Meta:
+        node = CitationNode
+
+
 
 class QuestionNode(DjangoObjectType):
     class Meta:
         model = Question
         interfaces = (relay.Node,)
 
-    citations = List(CitationNode)
+    citations = ConnectionField(CitationConnection)
 
     def resolve_citations(self, args):
         return self.citations.all()
@@ -38,7 +43,7 @@ class AnswerNode(DjangoObjectType):
         interfaces = (relay.Node,)
         convert_choices_to_enum = False
 
-    citations = List(CitationNode)
+    citations = ConnectionField(CitationConnection)
 
     def resolve_citations(self, args):
         return self.citations.all()
