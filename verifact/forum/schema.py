@@ -25,7 +25,6 @@ class CitationConnection(Connection):
         node = CitationNode
 
 
-
 class QuestionNode(DjangoObjectType):
     class Meta:
         model = Question
@@ -37,16 +36,9 @@ class QuestionNode(DjangoObjectType):
         return self.citations.all()
 
 
-class AnswerNode(DjangoObjectType):
+class QuestionConnection(relay.Connection):
     class Meta:
-        model = Answer
-        interfaces = (relay.Node,)
-        convert_choices_to_enum = False
-
-    citations = ConnectionField(CitationConnection)
-
-    def resolve_citations(self, args):
-        return self.citations.all()
+        node = QuestionNode
 
 
 class VoteNode(DjangoObjectType):
@@ -55,19 +47,30 @@ class VoteNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
-class QuestionConnection(relay.Connection):
+class VoteConnection(relay.Connection):
     class Meta:
-        node = QuestionNode
+        node = VoteNode
+
+
+class AnswerNode(DjangoObjectType):
+    class Meta:
+        model = Answer
+        interfaces = (relay.Node,)
+        convert_choices_to_enum = False
+
+    viewer_vote = ConnectionField(VoteConnection)
+    citations = ConnectionField(CitationConnection)
+
+    def resolve_viewer_vote(self,args):
+        return Vote.objects.filter(answer=self).filter(user=args.context.user)
+
+    def resolve_citations(self, args):
+        return self.citations.all()
 
 
 class AnswerConnection(relay.Connection):
     class Meta:
         node = AnswerNode
-
-
-class VoteConnection(relay.Connection):
-    class Meta:
-        node = VoteNode
 
 
 class Query(ObjectType):
