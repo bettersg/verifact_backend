@@ -1,4 +1,4 @@
-from graphene import relay, ObjectType, String, Field, ID, Boolean, List, NonNull
+from graphene import relay, ObjectType, String, Field, ID, Boolean, List, NonNull, JSONString
 from graphene.relay import Node, Connection, ConnectionField, ClientIDMutation
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
@@ -58,14 +58,17 @@ class AnswerNode(DjangoObjectType):
         interfaces = (relay.Node,)
         convert_choices_to_enum = False
 
-    viewer_vote = ConnectionField(VoteConnection)
     citations = ConnectionField(CitationConnection)
-
-    def resolve_viewer_vote(self,args):
-        return Vote.objects.filter(answer=self).filter(user=args.context.user)
+    viewer_vote = Field(VoteNode)
 
     def resolve_citations(self, args):
         return self.citations.all()
+
+    def resolve_viewer_vote(self, args):
+        try:
+            return Vote.objects.get(answer=self, user=args.context.user)
+        except Vote.DoesNotExist:
+            return None
 
 
 class AnswerConnection(relay.Connection):
