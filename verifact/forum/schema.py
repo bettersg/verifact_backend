@@ -1,4 +1,5 @@
 from graphene import relay, ObjectType, String, Field, ID, Boolean, List, NonNull, JSONString
+from django.contrib.auth.models import AnonymousUser
 from graphene.relay import Node, Connection, ConnectionField, ClientIDMutation
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
@@ -66,7 +67,8 @@ class AnswerNode(DjangoObjectType):
 
     def resolve_viewer_vote(self, args):
         try:
-            return Vote.objects.get(answer=self, user=args.context.user)
+            if args.context.user.is_authenticated:
+                return Vote.objects.get(answer=self, user=args.context.user)
         except Vote.DoesNotExist:
             return None
 
