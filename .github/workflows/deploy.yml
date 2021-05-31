@@ -75,13 +75,15 @@ jobs:
           DB_PORT: 3306
         run: |
           # Connect to Cloud SQL PRoxy in the background
-          # Push stdout and stderr to
+          # Push stdout and stderr to proxy.log file
           ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 >proxy.log 2>&1 &
+          # Save the process id
           PID=$!
           # Wait up to 20 seconds for cloud sql proxy to be ready
           for attempt in $(seq 1 20); do
             sleep 1
             if grep -q "Ready for new connections" proxy.log; then
+              echo "Cloud SQL Proxy is ready for new connections"
               break
             fi
             if [[ attempt -eq 20 ]]; then
@@ -91,5 +93,5 @@ jobs:
           done
           # Run migrations
           pipenv run python manage.py migrate
-          # Kill Cloud SQL Proxy
+          # Kill the process
           kill $PID
