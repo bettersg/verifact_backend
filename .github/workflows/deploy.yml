@@ -74,8 +74,22 @@ jobs:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
         run: |
-          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 &
+          # Connect to Cloud SQL PRoxy in the background
+          # Push stdout and stderr to
+          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 >proxy.log 2>&1 &
           PID=$!
-          sleep 5
+          # Wait up to 20 seconds for cloud sql proxy to be ready
+          for attempt in $(seq 1 20); do
+            sleep 1
+            if grep -q "Ready for new connections" proxy.log; then
+              break
+            fi
+            if [[ attempt -eq 20 ]]; then
+              echo "Error launching sql proxy"
+              exit
+            fi
+          done
+          # Run migrations
           pipenv run python manage.py migrate
+          # Kill Cloud SQL Proxy
           kill $PID
