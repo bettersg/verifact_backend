@@ -46,15 +46,6 @@ jobs:
           wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
           chmod +x cloud_sql_proxy
 
-      - name: Backup database
-        run: |
-          gcloud sql backups create --instance=$DB_INSTANCE
-
-      - name: Migrate database
-        run: |
-          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 &
-          pipenv run python manage.py migrate
-
         # - name: Output requirements.txt for gcloud deploy
         #   run: pipenv lock -r > requirements.txt
 
@@ -72,3 +63,13 @@ jobs:
 
         # - name: Deploy to App Engine
         #   run: gcloud app deploy --quiet
+        #
+        #       - name: Backup database
+        #         run: |
+        #           gcloud sql backups create --instance=$DB_INSTANCE
+        #
+
+      - name: Migrate database
+        run: |
+          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 &
+          pipenv run python manage.py migrate
