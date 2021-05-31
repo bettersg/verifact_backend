@@ -17,7 +17,6 @@ jobs:
       DB_PORT: ${{ secrets.DB_PORT }}
       CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
       CLIENT_HOST: ${{ secrets.CLIENT_HOST }}
-      DB_INSTANCE: ${{ secrets.DB_INSTANCE }}
 
     steps:
       - uses: actions/checkout@v2
@@ -61,38 +60,39 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-      # - name: Deploy to App Engine
-      #   run: gcloud app deploy --quiet
+      - name: Deploy to App Engine
+        run: gcloud app deploy --quiet
 
       - name: Backup database
         env:
-          GCP_DB_INSTANCE_NAME: ${{ secrets.GCP_DB_INSTANCE_NAME }}
+          DB_INSTANCE_NAME: ${{ secrets.DB_INSTANCE_NAME }}
         run: |
-          gcloud sql backups create --instance=$GCP_DB_INSTANCE_NAME
+          gcloud sql backups create --instance=$DB_INSTANCE_NAME
 
-      # - name: Migrate database
-      #   env:
-      #     DB_HOST: 127.0.0.1
-      #     DB_PORT: 3306
-      #   run: |
-      #     # Connect to Cloud SQL PRoxy in the background
-      #     # Push stdout and stderr to proxy.log file
-      #     ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 >proxy.log 2>&1 &
-      #     # Save the process id
-      #     PID=$!
-      #     # Wait up to 20 seconds for cloud sql proxy to be ready
-      #     for attempt in $(seq 1 20); do
-      #       sleep 1
-      #       if grep -q "Ready for new connections" proxy.log; then
-      #         echo "Cloud SQL Proxy is ready for new connections"
-      #         break
-      #       fi
-      #       if [[ attempt -eq 20 ]]; then
-      #         echo "Error launching sql proxy"
-      #         exit
-      #       fi
-      #     done
-      #     # Run migrations
-      #     pipenv run python manage.py migrate
-      #     # Kill the process
-      #     kill $PID
+      - name: Migrate database
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_INSTANCE_CONNECTION_NAME: ${{ secrets.DB_INSTANCE_CONNECTION_NAME }}
+        run: |
+          # Connect to Cloud SQL PRoxy in the background
+          # Push stdout and stderr to proxy.log file
+          ./cloud_sql_proxy -instances=$DB_INSTANCE_CONNECTION_NAME=tcp:3306 >proxy.log 2>&1 &
+          # Save the process id
+          PID=$!
+          # Wait up to 20 seconds for cloud sql proxy to be ready
+          for attempt in $(seq 1 20); do
+            sleep 1
+            if grep -q "Ready for new connections" proxy.log; then
+              echo "Cloud SQL Proxy is ready for new connections"
+              break
+            fi
+            if [[ attempt -eq 20 ]]; then
+              echo "Error launching sql proxy"
+              exit
+            fi
+          done
+          # Run migrations
+          pipenv run python manage.py migrate
+          # Kill the process
+          kill $PID
