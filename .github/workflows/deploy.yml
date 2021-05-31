@@ -76,5 +76,6 @@ jobs:
         run: |
           ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 &
           PID=$!
+          sleep 5
           pipenv run python manage.py migrate
           kill $PID
