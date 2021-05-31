@@ -17,6 +17,7 @@ jobs:
       DB_PORT: ${{ secrets.DB_PORT }}
       CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
       CLIENT_HOST: ${{ secrets.CLIENT_HOST }}
+      DB_INSTANCE: ${{ secrets.DB_INSTANCE }}
 
     steps:
       - uses: actions/checkout@v2
@@ -40,12 +41,17 @@ jobs:
           pip install pipenv
           pipenv install -d
 
-      - name: Migrate database
-        env:
-          DB_INSTANCE: ${{ secrets.DB_INSTANCE }}
+      - name: Get Cloud SQL Proxy binary
         run: |
-          curl -o cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.darwin.amd64
+          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
           chmod +x cloud_sql_proxy
+
+      - name: Backup database
+        run: |
+          gcloud sql backups create --instance=$DB_INSTANCE
+
+      - name: Migrate database
+        run: |
           ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 &
           pipenv run python manage.py migrate
 
