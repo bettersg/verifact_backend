@@ -42,7 +42,7 @@ jobs:
 
       - name: Migrate database
         env:
-          DB_INSTANCE: {{ secrets.DB_INSTANCE }}
+          DB_INSTANCE: ${{ secrets.DB_INSTANCE }}
         run: |
           curl -o cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.darwin.amd64
           chmod +x cloud_sql_proxy
