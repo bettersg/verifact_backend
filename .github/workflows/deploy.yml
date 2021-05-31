@@ -46,14 +46,14 @@ jobs:
           wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
           chmod +x cloud_sql_proxy
 
-        # - name: Output requirements.txt for gcloud deploy
-        #   run: pipenv lock -r > requirements.txt
+      - name: Output requirements.txt for gcloud deploy
+        run: pipenv lock -r > requirements.txt
 
-        # - name: Collect Django static assets
-        #   run: pipenv run python manage.py collectstatic
+      - name: Collect Django static assets
+        run: pipenv run python manage.py collectstatic
 
-        # - name: Inject app.yml environment variables for gcloud App Engine deployment
-        #   uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
+      - name: Inject app.yml environment variables for gcloud App Engine deployment
+        uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.2.0
@@ -61,37 +61,36 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-        # - name: Deploy to App Engine
-        #   run: gcloud app deploy --quiet
-        #
-        #       - name: Backup database
-        #         run: |
-        #           gcloud sql backups create --instance=$DB_INSTANCE
-        #
+      # - name: Deploy to App Engine
+      #   run: gcloud app deploy --quiet
 
-      - name: Migrate database
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
+      - name: Backup database
         run: |
-          # Connect to Cloud SQL PRoxy in the background
-          # Push stdout and stderr to proxy.log file
-          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 >proxy.log 2>&1 &
-          # Save the process id
-          PID=$!
-          # Wait up to 20 seconds for cloud sql proxy to be ready
-          for attempt in $(seq 1 20); do
-            sleep 1
-            if grep -q "Ready for new connections" proxy.log; then
-              echo "Cloud SQL Proxy is ready for new connections"
-              break
-            fi
-            if [[ attempt -eq 20 ]]; then
-              echo "Error launching sql proxy"
-              exit
-            fi
-          done
-          # Run migrations
-          pipenv run python manage.py migrate
-          # Kill the process
-          kill $PID
+          gcloud sql backups create --instance=$DB_INSTANCE
+
+      # - name: Migrate database
+      #   env:
+      #     DB_HOST: 127.0.0.1
+      #     DB_PORT: 3306
+      #   run: |
+      #     # Connect to Cloud SQL PRoxy in the background
+      #     # Push stdout and stderr to proxy.log file
+      #     ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 >proxy.log 2>&1 &
+      #     # Save the process id
+      #     PID=$!
+      #     # Wait up to 20 seconds for cloud sql proxy to be ready
+      #     for attempt in $(seq 1 20); do
+      #       sleep 1
+      #       if grep -q "Ready for new connections" proxy.log; then
+      #         echo "Cloud SQL Proxy is ready for new connections"
+      #         break
+      #       fi
+      #       if [[ attempt -eq 20 ]]; then
+      #         echo "Error launching sql proxy"
+      #         exit
+      #       fi
+      #     done
+      #     # Run migrations
+      #     pipenv run python manage.py migrate
+      #     # Kill the process
+      #     kill $PID
