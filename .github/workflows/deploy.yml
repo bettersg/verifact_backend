@@ -75,5 +75,5 @@ jobs:
           DB_PORT: 3306
         run: |
           echo $DB_INSTANCE
-          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:5432 &
+          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 &
           pipenv run python manage.py migrate
