@@ -3,10 +3,21 @@ on:
   push:
     branches:
       - main
+      - migration-deploy-script
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
+      CLIENT_HOST: ${{ secrets.CLIENT_HOST }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -29,36 +40,29 @@ jobs:
           pip install pipenv
           pipenv install -d
 
-      - name: Output requirements.txt for gcloud deploy
-        run: pipenv lock -r > requirements.txt
-
-      - name: Collect Django static assets
+      - name: Migrate database
         env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
-          CLIENT_HOST: ${{ secrets.CLIENT_HOST }}
-        run: pipenv run python manage.py collectstatic
+          DB_INSTANCE: {{ secrets.DB_INSTANCE }}
+        run: |
+          curl -o cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.darwin.amd64
+          chmod +x cloud_sql_proxy
+          ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:3306 &
+          pipenv run python manage.py migrate
 
-      - name: Inject app.yml environment variables for gcloud App Engine deployment
-        uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          CLIENT_ORIGIN: ${{ secrets.CLIENT_ORIGIN }}
-          CLIENT_HOST: ${{ secrets.CLIENT_HOST }}
+        # - name: Output requirements.txt for gcloud deploy
+        #   run: pipenv lock -r > requirements.txt
 
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.2.0
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+        # - name: Collect Django static assets
+        #   run: pipenv run python manage.py collectstatic
 
-      - name: Deploy to App Engine
-        run: gcloud app deploy --quiet
+        # - name: Inject app.yml environment variables for gcloud App Engine deployment
+        #   uses: ikuanyshbekov/app-yaml-env-compiler@v1.0
+
+        # - name: Setup Google Cloud SDK
+        #   uses: google-github-actions/setup-gcloud@v0.2.0
+        #   with:
+        #     project_id: ${{ secrets.GCP_PROJECT_ID }}
+        #     service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+        # - name: Deploy to App Engine
+        #   run: gcloud app deploy --quiet
