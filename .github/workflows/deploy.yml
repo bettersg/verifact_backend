@@ -70,6 +70,9 @@ jobs:
         #
 
       - name: Migrate database
+        env:
+          DB_HOST: localhost
+          DB_PORT: 3306
         run: |
           echo $DB_INSTANCE
           ./cloud_sql_proxy -instances=$DB_INSTANCE=tcp:5432 &
