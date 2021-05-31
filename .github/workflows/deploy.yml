@@ -65,8 +65,10 @@ jobs:
       #   run: gcloud app deploy --quiet
 
       - name: Backup database
+        env:
+          GCP_DB_INSTANCE_NAME: ${{ secrets.GCP_DB_INSTANCE_NAME }}
         run: |
-          gcloud sql backups create --instance=$DB_INSTANCE
+          gcloud sql backups create --instance=$GCP_DB_INSTANCE_NAME
 
       # - name: Migrate database
       #   env:
