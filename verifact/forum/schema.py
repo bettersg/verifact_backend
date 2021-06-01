@@ -37,6 +37,13 @@ class QuestionFilter(FilterSet):
         model = Question
         fields = []
 
+
+class VoteNode(DjangoObjectType):
+    class Meta:
+        model = Vote
+        interfaces = (relay.Node,)
+
+
 class QuestionNode(DjangoObjectType):
     class Meta:
         model = Question
@@ -47,17 +54,6 @@ class QuestionNode(DjangoObjectType):
 
     def resolve_citations(self, args):
         return self.citations.all()
-
-
-class VoteNode(DjangoObjectType):
-    class Meta:
-        model = Vote
-        interfaces = (relay.Node,)
-
-
-class VoteConnection(relay.Connection):
-    class Meta:
-        node = VoteNode
 
 
 class AnswerNode(DjangoObjectType):
@@ -77,11 +73,6 @@ class AnswerNode(DjangoObjectType):
             return Vote.objects.get(answer=self, user=args.context.user)
         except Vote.DoesNotExist:
             return None
-
-
-class AnswerConnection(relay.Connection):
-    class Meta:
-        node = AnswerNode
 
 
 class Query(ObjectType):
