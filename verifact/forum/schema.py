@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 class CitationNode(DjangoObjectType):
     class Meta:
         model = Citation
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
 
 class CitationConnection(Connection):
     class Meta:
@@ -41,13 +41,13 @@ class QuestionFilter(FilterSet):
 class VoteNode(DjangoObjectType):
     class Meta:
         model = Vote
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
 
 
 class QuestionNode(DjangoObjectType):
     class Meta:
         model = Question
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
         filterset_class = QuestionFilter
 
     citations = ConnectionField(CitationConnection)
@@ -59,7 +59,7 @@ class QuestionNode(DjangoObjectType):
 class AnswerNode(DjangoObjectType):
     class Meta:
         model = Answer
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
         convert_choices_to_enum = False
 
     citations = ConnectionField(CitationConnection)
