@@ -2,7 +2,8 @@ from graphene import relay, ObjectType, String, Field, ID, Boolean, List, NonNul
 from graphene.relay import Node, Connection, ConnectionField, ClientIDMutation
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
-from verifact.forum.utils import OrderedDjangoFilterConnectionField
+from django_filters import FilterSet, OrderingFilter
+from graphene_django.filter import DjangoFilterConnectionField
 import base64
 from graphql import GraphQLError
 from django.db import IntegrityError
@@ -25,12 +26,22 @@ class CitationConnection(Connection):
     class Meta:
         node = CitationNode
 
+class QuestionFilter(FilterSet):
+    order_by = OrderingFilter(
+        fields=(
+            ("created_at",)
+        )
+    )
+
+    class Meta:
+        model = Question
+        fields = []
 
 class QuestionNode(DjangoObjectType):
     class Meta:
         model = Question
         interfaces = (relay.Node,)
-        filter_fields = []
+        filterset_class = QuestionFilter
 
     citations = ConnectionField(CitationConnection)
 
@@ -74,7 +85,7 @@ class AnswerConnection(relay.Connection):
 
 
 class Query(ObjectType):
-    questions = OrderedDjangoFilterConnectionField(QuestionNode, orderBy=List(of_type=String))
+    questions = DjangoFilterConnectionField(QuestionNode,)
 
 
 def citation_create_mutation(url, content, user):
