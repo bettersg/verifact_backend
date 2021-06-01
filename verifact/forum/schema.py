@@ -1,5 +1,4 @@
 from graphene import relay, ObjectType, String, Field, ID, Boolean, List, NonNull, JSONString
-from django.contrib.auth.models import AnonymousUser
 from graphene.relay import Node, Connection, ConnectionField, ClientIDMutation
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
