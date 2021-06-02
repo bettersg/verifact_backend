@@ -66,7 +66,8 @@ class AnswerNode(DjangoObjectType):
 
     def resolve_viewer_vote(self, args):
         try:
-            return Vote.objects.get(answer=self, user=args.context.user)
+            if args.context.user.is_authenticated:
+                return Vote.objects.get(answer=self, user=args.context.user)
         except Vote.DoesNotExist:
             return None
 
