@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "graphene_django",
     "verifact.forum",
+    "django_filters",
 ]
 
 GRAPHENE = {

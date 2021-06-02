@@ -18,6 +18,7 @@ pyjwt = "==1.7.1" # 2.0.0 causes a bug in django-graphql-jwt https://github.com/
 gunicorn = "*"
 beautifulsoup4 = "*"
 requests = "*"
+django-filter = "*"
 
 [requires]
 python_version = "3.8"

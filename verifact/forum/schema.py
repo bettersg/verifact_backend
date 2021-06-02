@@ -2,6 +2,8 @@ from graphene import relay, ObjectType, String, Field, ID, Boolean, List, NonNul
 from graphene.relay import Node, Connection, ConnectionField, ClientIDMutation
 from graphql_relay.node.node import from_global_id
 from graphene_django import DjangoObjectType
+from django_filters import FilterSet, OrderingFilter
+from graphene_django.filter import DjangoFilterConnectionField
 import base64
 from graphql import GraphQLError
 from django.db import IntegrityError
@@ -18,17 +20,35 @@ from urllib.parse import urlparse
 class CitationNode(DjangoObjectType):
     class Meta:
         model = Citation
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
 
 class CitationConnection(Connection):
     class Meta:
         node = CitationNode
 
+class QuestionFilter(FilterSet):
+    order_by = OrderingFilter(
+        fields=(
+            ("created_at",)
+        )
+    )
+
+    class Meta:
+        model = Question
+        fields = []
+
+
+class VoteNode(DjangoObjectType):
+    class Meta:
+        model = Vote
+        interfaces = (Node,)
+
 
 class QuestionNode(DjangoObjectType):
     class Meta:
         model = Question
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
+        filterset_class = QuestionFilter
 
     citations = ConnectionField(CitationConnection)
 
@@ -36,26 +56,10 @@ class QuestionNode(DjangoObjectType):
         return self.citations.all()
 
 
-class QuestionConnection(relay.Connection):
-    class Meta:
-        node = QuestionNode
-
-
-class VoteNode(DjangoObjectType):
-    class Meta:
-        model = Vote
-        interfaces = (relay.Node,)
-
-
-class VoteConnection(relay.Connection):
-    class Meta:
-        node = VoteNode
-
-
 class AnswerNode(DjangoObjectType):
     class Meta:
         model = Answer
-        interfaces = (relay.Node,)
+        interfaces = (Node,)
         convert_choices_to_enum = False
 
     citations = ConnectionField(CitationConnection)
@@ -72,16 +76,8 @@ class AnswerNode(DjangoObjectType):
             return None
 
 
-class AnswerConnection(relay.Connection):
-    class Meta:
-        node = AnswerNode
-
-
 class Query(ObjectType):
-    questions = relay.ConnectionField(QuestionConnection)
-
-    def resolve_questions(root, info):
-        return Question.objects.all()
+    questions = DjangoFilterConnectionField(QuestionNode,)
 
 
 def citation_create_mutation(url, content, user):
